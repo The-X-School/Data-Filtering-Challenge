@@ -6,9 +6,10 @@ import argparse
 import torch
 import os
 import json
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments
 from peft import PeftModel
 from huggingface_hub import login, HfApi, create_repo
+from datasets import load_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Upload PEFT model to Hugging Face Hub")
@@ -242,5 +243,39 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
     if os.path.exists(temp_dir):
         import shutil
         shutil.rmtree(temp_dir)
+
+    # Prepare data for training
+    dataset = load_dataset("json", data_files="data/climblab_sample/climblab_sample.jsonl", split="train")
+
+    def tokenize_function(example):
+        return tokenizer(example["text"], truncation=True, padding="max_length", max_length=128)
+
+    tokenized_dataset = dataset.map(tokenize_function, batched=True)
+
+    # Fine-tune the model
+    training_args = TrainingArguments(
+        output_dir="./results",
+        per_device_train_batch_size=4,
+        num_train_epochs=1,
+        save_steps=10_000,
+        save_total_limit=2,
+        logging_steps=500,
+        fp16=True,  # if your hardware supports it
+    )
+
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=tokenized_dataset,
+    )
+
+    trainer.train()
+
+    trainer.save_model("my-llama-400m-climblab")
+    # Or push to hub
+    # trainer.push_to_hub("your-username/llama-400m-climblab-climblab")
+
+    print(torch.__version__)
+
 if __name__ == "__main__":
     main()
