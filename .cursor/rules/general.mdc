@@ -10,6 +10,7 @@ Core Principles
 	2.	Code Language: All code, comments, and documentation in the project must be written in English.
 	3.	YOLO Mode: All commands should be executed automatically by default (YOLO mode), without waiting for manual approval.
 	4.	No Bulk Modifications: It is strictly forbidden to use ‎⁠sed⁠, ‎⁠awk⁠, or similar scripting tools for bulk code replacements. All changes must be made individually to ensure accuracy.
+    5.  Format: All complex writing and deeper explaination has to be written in Markdown Format when applicable. 
 
 Workflow
 	1.	Understand Requirements: Before coding, thoroughly analyze the requirements from multiple perspectives to ensure a deep understanding of the problem.
