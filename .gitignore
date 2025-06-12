@@ -9,6 +9,12 @@ _build
 # C extensions
 *.so
 
+.*
+!.cargo/
+!.github/
+!.gitignore
+!.cursor/
+
 # tests and logs
 tests/fixtures/cached_*_text.txt
 logs/
