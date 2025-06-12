@@ -3,175 +3,70 @@ description:
 globs: 
 alwaysApply: true
 ---
-# ELMB 评估规则与评估框架指导
 
-## ELMB 基准评估核心理解
-1. **评估目标**: 通过ELMB (Edge Language Model Benchmark) 衡量数据过滤技术的有效性
-2. **核心指标**: S = Simprove - Sbase (过滤数据集的性能提升)
-3. **评估任务**: 4个核心任务，每个任务独立评估且贡献总分
-4. **评估框架**: 基于 lm-evaluation-harness 的标准化评估流程
 
-## ELMB 四个核心任务配置
+description: ELMB Evaluation Rules & Framework Guideglobs:alwaysApply: true
 
-### 1. Roleplay 任务 (elmb_roleplay)
-- **任务文件**: `lm-evaluation-harness/lm_eval/tasks/elmb_roleplay/elmb_roleplay.yaml`
-- **数据集**: `data4elm/ELMB-RolePlay`
-- **评估指标**: `acc` (accuracy) 和 `acc_norm` (normalized accuracy)
-- **输出类型**: multiple_choice
-- **提示格式**: "Question: {{question}}\nAnswer:"
-- **评估重点**: 交互式数字环境中的角色扮演能力
+ELMB Evaluation Rules & Framework
 
-### 2. Reasoning 任务 (elmb_reasoning)
-- **任务文件**: `lm-evaluation-harness/lm_eval/tasks/elmb_reasoning/elmb_reasoning.yaml`
-- **数据集**: `data4elm/ELMB-Reasoning`  
-- **评估指标**: `acc` 和 `acc_norm`
-- **输出类型**: multiple_choice
-- **提示格式**: "Question: {{question}}\nAnswer:"
-- **评估重点**: 复杂问题解决和逻辑推理能力（机器人应用）
+Purpose
 
-### 3. Function Calling 任务 (elmb_functioncalling)
-- **任务文件**: `lm-evaluation-harness/lm_eval/tasks/elmb_functioncalling/elmb_functioncalling.yaml`
-- **数据集**: `data4elm/ELMB-FunctionCalling`
-- **评估指标**: `acc` 和 `acc_norm`
-- **输出类型**: multiple_choice
-- **提示格式**: "Question: {{question}}\nAnswer:"
-- **评估重点**: 移动设备交互和API调用能力
+Standardize model evaluation for the Edge Language Model Benchmark (ELMB) using lm-evaluation-harness. Focus on measuring data filtering effectiveness and maximizing S = Simprove - Sbase across four tasks.
 
-### 4. RAG 任务 (elmb_chatrag)
-- **任务文件**: `lm-evaluation-harness/lm_eval/tasks/elmb_chatrag/elmb_chatrag.yaml`
-- **数据集**: `data4elm/ELMB-ChatRAG`
-- **评估指标**: `acc` 和 `acc_norm`
-- **输出类型**: multiple_choice
-- **提示格式**: "Context: {{ctx}}\nQuestion: {{question}}\nAnswer:"
-- **评估重点**: 检索增强生成和文档理解能力
+Core Evaluation Principles
+	•	Evaluate with ELMB to measure filtered data effectiveness.
+	•	S = Simprove - Sbase; maximize improvement.
+	•	Four tasks: Roleplay, Reasoning, Function Calling, RAG—each scored independently.
 
-## 标准评估命令与流程
+Task Configurations
 
-### 基础评估命令
-```bash
-lm_eval --model hf \
+Roleplay (‎⁠elmb_roleplay⁠)
+	•	Task File: ‎⁠lm-evaluation-harness/lm_eval/tasks/elmb_roleplay/elmb_roleplay.yaml⁠
+	•	Dataset: ‎⁠data4elm/ELMB-RolePlay⁠
+	•	Metrics: ‎⁠acc⁠, ‎⁠acc_norm⁠
+	•	Output: multiple_choice
+	•	Prompt: ‎⁠Question: {{question}}\nAnswer:⁠
+
+Reasoning (‎⁠elmb_reasoning⁠)
+	•	Task File: ‎⁠lm-evaluation-harness/lm_eval/tasks/elmb_reasoning/elmb_reasoning.yaml⁠
+	•	Dataset: ‎⁠data4elm/ELMB-Reasoning⁠
+	•	Metrics: ‎⁠acc⁠, ‎⁠acc_norm⁠
+	•	Output: multiple_choice
+	•	Prompt: ‎⁠Question: {{question}}\nAnswer:⁠
+
+Function Calling (‎⁠elmb_functioncalling⁠)
+	•	Task File: ‎⁠lm-evaluation-harness/lm_eval/tasks/elmb_functioncalling/elmb_functioncalling.yaml⁠
+	•	Dataset: ‎⁠data4elm/ELMB-FunctionCalling⁠
+	•	Metrics: ‎⁠acc⁠, ‎⁠acc_norm⁠
+	•	Output: multiple_choice
+	•	Prompt: ‎⁠Question: {{question}}\nAnswer:⁠
+
+RAG (‎⁠elmb_chatrag⁠)
+	•	Task File: ‎⁠lm-evaluation-harness/lm_eval/tasks/elmb_chatrag/elmb_chatrag.yaml⁠
+	•	Dataset: ‎⁠data4elm/ELMB-ChatRAG⁠
+	•	Metrics: ‎⁠acc⁠, ‎⁠acc_norm⁠
+	•	Output: multiple_choice
+	•	Prompt: ‎⁠Context: {{ctx}}\nQuestion: {{question}}\nAnswer:⁠
+
+Standard Evaluation Commandlm_eval --model hf \
     --model_args pretrained=[MODEL_PATH],trust_remote_code=True,cache_dir=~/.cache \
     --tasks elmb_functioncalling,elmb_chatrag,elmb_reasoning,elmb_roleplay \
     --device cuda:0 \
     --batch_size 1 \
     --log_samples \
     --output_path ./eval_results/[EXPERIMENT_NAME]
-```
 
-### 评估参数详解
-- `--model hf`: 使用 HuggingFace 模型加载器
-- `--model_args`: 模型配置参数
-  - `pretrained`: 模型路径（本地或HF Hub）
-  - `trust_remote_code=True`: 允许执行远程代码
-  - `cache_dir`: 模型缓存目录
-- `--tasks`: 指定ELMB四个任务（用逗号分隔）
-- `--device`: 指定计算设备（cuda:0, cuda:1等）
-- `--batch_size`: 批处理大小（建议为1以确保稳定性）
-- `--log_samples`: 记录具体样本预测结果
-- `--output_path`: 结果输出路径
+Best Practices
+	•	Use identical hardware/software environments and fixed random seeds for reproducibility.
+	•	Monitor GPU memory; batch_size=1 recommended.
+	•	Save intermediate results to avoid interruptions.
+	•	Evaluate all four tasks; ensure results are complete and in the correct range.
+	•	For troubleshooting: check model/data paths, reduce batch size for OOM errors, validate prompt formats.
 
-## 评估结果解读规则
+Reporting
+	•	Summarize results for all tasks.
+	•	Report both ‎⁠acc⁠ and ‎⁠acc_norm⁠, prioritizing ‎⁠acc_norm⁠.
+	•	Calculate and report S for each task and overall.
+	•	Include error analysis and improvement suggestions.
 
-### 1. 性能指标理解
-- **acc (Accuracy)**: 准确率，直接反映模型回答正确的比例
-- **acc_norm (Normalized Accuracy)**: 标准化准确率，考虑选择偏置的校正准确率
-- **评估优先级**: 优先关注 `acc_norm` 作为主要评估指标
-
-### 2. 基准性能 (Sbase) 获取
-- **定义**: 使用基础数据集（如 Fineweb）预训练的模型在ELMB上的表现
-- **获取方式**: 由竞赛组织方提供基准模型和性能数据
-- **记录格式**: 每个任务独立记录 Sbase 值
-
-### 3. 改进性能 (Simprove) 计算
-- **定义**: 使用过滤数据集持续预训练后的模型在ELMB上的表现
-- **计算方式**: 在相同评估设置下运行标准评估流程
-- **记录要求**: 确保与 Sbase 评估条件完全一致
-
-### 4. 性能提升 (S) 计算
-- **单任务提升**: S_task = Simprove_task - Sbase_task
-- **总体提升**: S_total = S_roleplay + S_reasoning + S_functioncalling + S_rag
-- **获胜标准**: 最大化 S_total 获得大奖，最大化单个 S_task 获得单项奖
-
-## 评估最佳实践
-
-### 1. 评估环境一致性
-- **硬件配置**: 确保评估使用相同的GPU型号和内存配置
-- **软件环境**: 使用相同版本的 lm-evaluation-harness 和依赖包
-- **随机种子**: 设置固定随机种子确保结果可重现
-
-### 2. 批量评估管理
-- **资源监控**: 监控GPU内存使用，避免OOM错误
-- **结果备份**: 及时保存中间结果，防止意外中断
-- **多次运行**: 进行多次评估取平均值，提高结果可靠性
-
-### 3. 结果验证检查
-- **数据完整性**: 确认所有四个任务都有完整结果
-- **指标合理性**: 检查准确率是否在合理范围内（0-1之间）
-- **对比验证**: 与已知基准进行横向对比验证
-
-## 评估调试与故障排除
-
-### 1. 常见错误处理
-- **CUDA内存不足**: 降低 batch_size 或使用梯度检查点
-- **模型加载失败**: 检查模型路径和权限设置
-- **数据集加载错误**: 验证数据集路径和格式正确性
-
-### 2. 性能异常诊断
-- **准确率异常低**: 检查模型是否正确加载，提示格式是否匹配
-- **某任务失败**: 单独运行失败任务进行详细诊断
-- **结果不稳定**: 增加评估轮次，检查随机性来源
-
-### 3. 评估结果分析
-- **单任务分析**: 分别分析四个任务的性能表现和提升空间
-- **错误案例分析**: 查看 log_samples 输出，分析具体错误模式
-- **性能瓶颈识别**: 确定哪些任务是主要限制因素
-
-## 自动化评估流程
-
-### 1. 批量模型评估脚本
-```bash
-#!/bin/bash
-MODELS=("model1" "model2" "model3")
-for MODEL in "${MODELS[@]}"; do
-    lm_eval --model hf \
-        --model_args pretrained=$MODEL,trust_remote_code=True \
-        --tasks elmb_functioncalling,elmb_chatrag,elmb_reasoning,elmb_roleplay \
-        --device cuda:0 \
-        --batch_size 1 \
-        --log_samples \
-        --output_path ./eval_results/${MODEL}_elmb
-done
-```
-
-### 2. 结果聚合和对比
-- **结果收集**: 自动收集所有模型的评估结果
-- **性能对比**: 生成性能对比表格和可视化图表
-- **提升计算**: 自动计算各模型相对于基准的性能提升
-
-## 评估报告生成
-
-### 1. 标准报告格式
-- **模型基本信息**: 模型名称、训练数据、参数量等
-- **评估结果汇总**: 四个任务的详细性能数据
-- **性能提升分析**: 相对基准的提升程度和排名
-- **错误分析**: 主要错误类型和改进建议
-
-### 2. 可视化展示
-- **性能雷达图**: 四个任务维度的综合表现
-- **提升柱状图**: 各任务的性能提升对比
-- **趋势分析图**: 不同数据过滤策略的效果趋势
-
-## 竞赛提交准备
-
-### 1. 最终评估检查清单
-- [ ] 所有四个ELMB任务都已完整评估
-- [ ] 评估结果格式符合要求
-- [ ] 模型检查点完整且可加载
-- [ ] 评估环境和参数记录完整
-- [ ] 结果具备可重现性
-
-### 2. 提交材料准备
-- **模型检查点**: 训练完成的模型文件
-- **评估结果**: 详细的ELMB评估报告
-- **评估脚本**: 用于重现评估结果的完整脚本
-- **环境配置**: 依赖包版本和运行环境说明
+Analogy: Treat evaluation like a standardized exam—same instructions, same environment, and fair scoring for all candidates.

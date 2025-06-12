@@ -3,43 +3,38 @@ description:
 globs: 
 alwaysApply: true
 ---
----
-description: "LMFlow architecture and design patterns guidance"
-globs: ["src/lmflow/**/*.py", "examples/**/*.py", "configs/**/*.json", "configs/**/*.yaml"]
-always: true
----
+LMFlow Architecture & Design Patterns
 
-# LMFlow 架构与设计模式规则
+Core Architecture
+	1.	Modular Design: LMFlow uses a clear modular structure:
+	▫	‎⁠src/lmflow/models/⁠: Model implementations, supporting HuggingFace models.
+	▫	‎⁠src/lmflow/datasets/⁠: Data processing, for uni- and multi-modal data.
+	▫	‎⁠src/lmflow/pipeline/⁠: Training/inference pipelines, supporting various fine-tuning strategies.
+	▫	‎⁠src/lmflow/utils/⁠: Utility functions.
+	2.	Design Patterns:
+	▫	Factory Pattern: Used in ‎⁠auto_model.py⁠, ‎⁠auto_pipeline.py⁠ for component selection.
+	▫	Template Pattern: Base classes (‎⁠base_model.py⁠, ‎⁠base_pipeline.py⁠) define interfaces.
+	▫	Strategy Pattern: Fine-tuning strategies (DoRA, LoRA, DPO) are interchangeable.
 
-## 核心架构理解
-1. **模块化设计**: LMFlow 采用清晰的模块化架构，主要组件包括：
-   - `src/lmflow/models/`: 模型实现层，支持各种 HuggingFace 模型
-   - `src/lmflow/datasets/`: 数据处理层，支持单模态和多模态数据
-   - `src/lmflow/pipeline/`: 训练和推理管道，包含各种微调策略
-   - `src/lmflow/utils/`: 工具函数层
+Code Organization
+	1.	Inheritance: All models inherit from base classes to ensure consistent interfaces.
+	2.	Config-Driven: Training parameters are controlled via YAML/JSON configs, not hardcoded.
+	3.	Pluggability: New fine-tuning strategies are added as plugins without disrupting existing structure.
 
-2. **设计模式遵循**:
-   - **Factory Pattern**: `auto_model.py`, `auto_pipeline.py` 等自动选择组件
-   - **Template Pattern**: `base_model.py`, `base_pipeline.py` 等基类定义接口
-   - **Strategy Pattern**: 不同的微调策略（DoRA、LoRA、DPO）可互换使用
+File Naming Conventions
+	1.	Model Files: Named by function, e.g., ‎⁠hf_decoder_model.py⁠, ‎⁠vision2seq_model.py⁠.
+	2.	Pipeline Files: Named by task, e.g., ‎⁠finetuner.py⁠, ‎⁠evaluator.py⁠, ‎⁠inferencer.py⁠.
+	3.	Config Files: Located in ‎⁠configs/⁠, clearly indicating purpose and parameters, e.g., ‎⁠ds_config_zero3.json⁠.
 
-## 代码组织原则
-1. **继承层次**: 所有模型继承自相应的基类，保持接口一致性
-2. **配置驱动**: 通过 YAML/JSON 配置文件控制训练参数，而非硬编码
-3. **插件化**: 新的微调策略应作为插件形式添加，不破坏现有结构
+New Feature Development
+	1.	Add Models: Create in ‎⁠models/⁠, inherit from the appropriate base class.
+	2.	Add Pipelines: Create in ‎⁠pipeline/⁠, implement standard interfaces.
+	3.	Add Datasets: Extend in ‎⁠datasets/⁠, support unified data format.
+	4.	Add Configs: Place in ‎⁠configs/⁠, follow existing naming conventions.
 
-## 文件命名约定
-1. **模型文件**: 以功能命名，如 `hf_decoder_model.py`, `vision2seq_model.py`
-2. **管道文件**: 以任务类型命名，如 `finetuner.py`, `evaluator.py`, `inferencer.py`
-3. **配置文件**: 在 `configs/` 下，明确标识用途和参数，如 `ds_config_zero3.json`
+Performance & Scalability
+	1.	Distributed Support: DeepSpeed distributed training is supported by default.
+	2.	Memory Optimization: Supports ZeRO strategies and offloading.
+	3.	Component Decoupling: Loose coupling allows independent testing and maintenance.
 
-## 新功能开发指导
-1. **添加新模型**: 在 `models/` 下创建，继承适当的基类
-2. **添加新管道**: 在 `pipeline/` 下创建，实现标准接口
-3. **添加新数据集**: 在 `datasets/` 下扩展，支持统一的数据格式
-4. **添加新配置**: 在 `configs/` 下添加，遵循现有命名规范
-
-## 性能与可扩展性
-1. **支持分布式**: 默认支持 DeepSpeed 分布式训练
-2. **内存优化**: 支持各种 ZeRO 策略和 offloading
-3. **模块解耦**: 各组件松耦合，便于独立测试和维护
+Analogy: LMFlow’s architecture is like a well-organized factory assembly line—each station (module) performs a specific task, and design patterns serve as blueprints ensuring every part fits and can be swapped or upgraded without halting the entire operation.

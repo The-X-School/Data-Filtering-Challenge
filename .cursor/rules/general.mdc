@@ -3,17 +3,17 @@ description:
 globs: 
 alwaysApply: true
 ---
-# 通用规则
+General Rules
 
-## 核心原则
-1.  **沟通语言**: 我们之间使用 **英文** 进行交流和讨论，特别是.cursor/rules里面的.mdc文件，请记得用英文，方便我们交流。
-2.  **代码语言**: 项目中所有的代码、注释、文档都必须使用 **英文**。
-3.  **YOLO 模式**: 所有需要执行的命令，都缺省在 YOLO 模式下自动运行，无需等待我的批准。
-4.  **禁止批量修改**: 严禁使用 `sed`、`awk` 或其他类似的脚本工具进行批量代码替换。所有修改都应逐个进行，以确保准确性。
+Core Principles
+	1.	Communication Language: All communication and discussion—especially in ‎⁠.cursor/rules⁠ ‎⁠.mdc⁠ files—must be in English for clarity and collaboration.
+	2.	Code Language: All code, comments, and documentation in the project must be written in English.
+	3.	YOLO Mode: All commands should be executed automatically by default (YOLO mode), without waiting for manual approval.
+	4.	No Bulk Modifications: It is strictly forbidden to use ‎⁠sed⁠, ‎⁠awk⁠, or similar scripting tools for bulk code replacements. All changes must be made individually to ensure accuracy.
 
-## 工作流程
-1.  **理解需求**: 在动手编码之前，请务必深入分析我的需求，从不同角度思考，确保完全理解问题的本质。
-2.  **方案分析**: 针对问题，提出不同的解决方案，并分析各自的优缺点和潜在风险。
-3.  **逻辑检查**: 在开始具体工作前，仔细检查你的推理过程是否存在漏洞。
-4.  **编码实现**: 编写清晰、规范的 Rust 代码，并遵循项目中现有的代码风格。
-5.  **测试**: 对于代码变更，思考并提出相应的测试方法。
+Workflow
+	1.	Understand Requirements: Before coding, thoroughly analyze the requirements from multiple perspectives to ensure a deep understanding of the problem.
+	2.	Solution Analysis: Propose different solutions for the problem, analyzing the pros, cons, and potential risks of each.
+	3.	Logic Check: Carefully review your reasoning process for any flaws before starting implementation.
+	4.	Coding: Write clear, well-structured Rust code that follows the existing project style.
+	5.	Testing: For any code changes, consider and propose appropriate testing methods.
