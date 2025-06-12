@@ -16,7 +16,7 @@ extra package to install if needed:
 
 create a wandb account and get an api key  
 [https://docs.wandb.ai/quickstart/](https://docs.wandb.ai/quickstart/)  
-[wandb.ai/authorize](wandb.ai/authorize)
+[https://wandb.ai/authorize](https://wandb.ai/authorize)
 
 Then run this code:
 ```
