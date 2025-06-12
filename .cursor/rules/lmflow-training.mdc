@@ -1,0 +1,101 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: "LMFlow training and fine-tuning best practices"
+globs: ["train.sh", "examples/finetune*.py", "examples/dpo*.py", "examples/raft*.py", "configs/ds_config*.json"]
+always: true
+---
+
+# LMFlow 训练与微调最佳实践
+
+## 微调策略理解
+1. **DoRA (Weight-Decomposed Low-Rank Adaptation)**:
+   - 项目主要使用的微调方法，比 LoRA 更高效
+   - 固定超参数：`learning_rate=1e-5`, `lora_r=16`, `num_train_epochs=1`
+   - 使用 `--use_dora 1` 启用，配合 `--lora_target_modules` 指定目标层
+
+2. **其他支持的方法**:
+   - **DPO (Direct Preference Optimization)**: 用于人类偏好对齐
+   - **Iterative DPO**: 迭代式偏好优化
+   - **RAFT**: 用于检索增强生成的对齐方法
+   - **Reward Modeling**: 奖励模型训练
+
+## 训练配置管理
+1. **DeepSpeed 配置**:
+   - 根据 GPU 内存选择合适的 ZeRO 策略
+   - `ds_config_zero0_no_offload.json`: 小模型，多 GPU
+   - `ds_config_zero2.json`: 中等模型，参数分片
+   - `ds_config_zero3.json`: 大模型，完全分片
+
+2. **超参数固定要求**:
+   - 为了消除超参数的干扰因素，必须保持：
+   - `num_train_epochs = 1`
+   - `learning_rate = 1e-5`  
+   - `lora_r = 16`
+
+3. **数据处理**:
+   - 支持最多 10B tokens 的训练数据
+   - 使用 `--block_size 1024` 控制序列长度
+   - 通过 `--preprocessing_num_workers` 优化数据预处理
+
+## 训练脚本使用
+1. **标准训练流程**:
+   ```bash
+   bash train.sh \
+     --model_name_or_path [MODEL_PATH] \
+     --dataset_path [DATASET_PATH] \
+     --output_dora_path [OUTPUT_PATH]
+   ```
+
+2. **关键参数设置**:
+   - `--per_device_train_batch_size`: 根据 GPU 内存调整
+   - `--gradient_accumulation_steps`: 有效增大 batch size
+   - `--save_steps`: 检查点保存频率
+   - `--logging_steps`: 日志记录频率
+
+3. **断点续训**:
+   - 使用 `--resume_from_checkpoint [CHECKPOINT_PATH]`
+   - 检查点路径格式：`[model-dir]/checkpoint-[index]`
+
+## 验证与评估
+1. **训练时验证**:
+   - `--validation_split_percentage 5`: 使用 5% 数据做验证
+   - `--eval_strategy steps`: 按步数评估
+   - `--eval_steps 20`: 每 20 步评估一次
+
+2. **ELMB 基准测试**:
+   - 使用 `lm-evaluation-harness` 进行评估
+   - 测试任务：`elmb_roleplay`, `elmb_reasoning`, `elmb_functioncalling`, `elmb_chatrag`
+   - 评估前需要合并 DoRA 权重到基模型
+
+## 模型管理
+1. **权重合并**:
+   ```bash
+   bash ./scripts/run_merge_dora.sh \
+     --model_name_or_path [BASE_MODEL] \
+     --lora_model_path [DORA_PATH] \
+     --output_model_path [MERGED_PATH]
+   ```
+
+2. **模型上传**:
+   - 参考 `example_upload_peft_model.py`
+   - 上传到 HuggingFace Hub 进行分享
+
+## 性能优化建议
+1. **内存优化**:
+   - 使用适当的 ZeRO 策略
+   - 启用 gradient checkpointing
+   - 调整 batch size 和 accumulation steps
+
+2. **速度优化**:
+   - 使用 `bf16` 混合精度训练
+   - 调整 `dataloader_num_workers`
+   - 优化 `preprocessing_num_workers`
+
+3. **监控与调试**:
+   - 使用 WandB 监控训练过程
+   - 检查 `log/` 目录下的训练日志
+   - 关注内存和 GPU 利用率

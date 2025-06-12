@@ -1,0 +1,137 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: "LMFlow development workflow and coding standards"
+globs: ["src/**/*.py", "examples/**/*.py", "*.py", "requirements.txt", "pyproject.toml", "setup.py"]
+always: true
+---
+
+# LMFlow 开发工作流与编码规范
+
+## 项目技术栈理解
+1. **核心依赖**:
+   - **PyTorch**: 深度学习框架，版本 >= 2.0.1
+   - **HuggingFace Transformers**: 预训练模型库，版本 >= 4.31.0
+   - **DeepSpeed**: 分布式训练框架，版本 >= 0.14.4
+   - **PEFT**: 参数高效微调库，版本 = 0.15.2
+   - **Accelerate**: 分布式训练加速库，版本 >= 0.27.2
+
+2. **代码质量工具**:
+   - **Ruff**: 代码检查和格式化，目标版本 Python 3.9
+   - **配置**: 使用双引号，4空格缩进，支持 docstring 格式化
+
+## 开发环境搭建
+1. **环境要求**:
+   - Linux OS (Ubuntu 20.04 测试通过)
+   - Python 3.9
+   - CUDA 支持的 GPU (推荐)
+   - MPI 支持 (conda install mpi4py)
+
+2. **安装步骤**:
+   ```bash
+   git clone -b v0.0.9 https://github.com/OptimalScale/LMFlow.git
+   cd LMFlow
+   git checkout data4elm
+   conda create -n lmflow python=3.9 -y
+   conda activate lmflow
+   conda install mpi4py
+   pip install -e .
+   ```
+
+## 代码贡献规范
+1. **模块开发规则**:
+   - 所有新功能必须继承相应的基类
+   - 使用 Factory Pattern 实现自动组件选择
+   - 保持接口一致性和向后兼容性
+
+2. **文件组织**:
+   - 模型相关代码放在 `src/lmflow/models/`
+   - 数据处理代码放在 `src/lmflow/datasets/`
+   - 训练管道代码放在 `src/lmflow/pipeline/`
+   - 工具函数放在 `src/lmflow/utils/`
+
+3. **命名约定**:
+   - 文件名使用小写下划线格式: `hf_decoder_model.py`
+   - 类名使用驼峰格式: `HfDecoderModel`
+   - 函数名使用小写下划线格式: `load_model`
+   - 常量使用大写下划线格式: `DEFAULT_CONFIG`
+
+## 配置文件管理
+1. **训练配置**:
+   - DeepSpeed 配置放在 `configs/ds_config_*.json`
+   - Accelerate 配置放在 `configs/accelerate_*.yaml`
+   - 迭代式训练配置放在 `configs/iterative_*.yaml`
+
+2. **配置命名规范**:
+   - 明确标识策略和用途: `ds_config_zero3_for_eval.json`
+   - 区分不同的硬件配置: `accelerator_multigpu_config.yaml`
+
+## 示例脚本开发
+1. **examples/ 目录规范**:
+   - 每个主要功能对应一个示例脚本
+   - 脚本应包含完整的参数解析和错误处理
+   - 提供清晰的使用说明和参数说明
+
+2. **常见示例类型**:
+   - `finetune.py`: 标准微调示例
+   - `inference.py`: 模型推理示例
+   - `evaluation.py`: 模型评估示例
+   - `*_gradio.py`: Web 界面示例
+
+## 测试与验证
+1. **代码测试**:
+   - 新功能必须包含对应的测试用例
+   - 使用小数据集进行功能验证
+   - 确保与现有功能的兼容性
+
+2. **性能测试**:
+   - 在不同硬件配置下测试
+   - 验证内存使用和训练速度
+   - 检查分布式训练的正确性
+
+## 文档与注释
+1. **代码注释**:
+   - 使用英文编写所有代码注释
+   - 重要函数需要详细的 docstring
+   - 复杂逻辑需要行内注释说明
+
+2. **配置文档**:
+   - 每个配置文件应包含参数说明
+   - 提供使用场景和适用条件
+   - 注明性能影响和资源要求
+
+## 版本兼容性
+1. **依赖版本管理**:
+   - 明确指定关键依赖的版本范围
+   - 定期测试最新版本的兼容性
+   - 及时更新 `requirements.txt`
+
+2. **向后兼容**:
+   - 新功能不能破坏现有 API
+   - 废弃功能需要提供迁移指南
+   - 保持配置文件格式的兼容性
+
+## 性能优化指导
+1. **内存优化**:
+   - 使用适当的数据类型 (bf16, fp16)
+   - 实现 gradient checkpointing
+   - 优化数据加载和预处理
+
+2. **计算优化**:
+   - 支持多种分布式训练策略
+   - 实现高效的注意力机制
+   - 优化模型前向和反向传播
+
+## 错误处理规范
+1. **异常处理**:
+   - 使用明确的异常类型
+   - 提供有用的错误信息
+   - 在关键位置添加错误恢复机制
+
+2. **日志记录**:
+   - 使用统一的日志格式
+   - 记录关键操作和参数
+   - 区分不同级别的日志信息
