@@ -9,141 +9,141 @@ globs: ["**/*.py", "**/*.sh", "**/*.json", "**/*.yaml", "log/**/*"]
 always: true
 ---
 
-# LMFlow 故障排除与调试指南
+# LMFlow Troubleshooting and Debugging Guide
 
-## 常见训练问题
-1. **内存溢出 (OOM)**:
-   - **症状**: CUDA out of memory 错误
-   - **解决方案**: 
-     - 降低 `per_device_train_batch_size`
-     - 增加 `gradient_accumulation_steps`
-     - 使用更高级的 ZeRO 策略 (ZeRO-2 → ZeRO-3)
-     - 启用 CPU offloading
+## Common Training Issues
+1. **Out of Memory (OOM)**:
+   - **Symptom**: CUDA out of memory error
+   - **Solution**: 
+     - Reduce `per_device_train_batch_size`
+     - Increase `gradient_accumulation_steps`
+     - Use more advanced ZeRO strategies (ZeRO-2 → ZeRO-3)
+     - Enable CPU offloading
 
-2. **分布式训练失败**:
-   - **症状**: 进程间通信错误或挂起
-   - **解决方案**:
-     - 检查 `--master_port` 是否被占用
-     - 确认所有节点的环境一致
-     - 增加 `--ddp_timeout` 值
-     - 验证网络连接和防火墙设置
+2. **Distributed Training Failure**:
+   - **Symptom**: Inter-process communication errors or hangs
+   - **Solution**:
+     - Check if `--master_port` is occupied
+     - Confirm consistent environment across all nodes
+     - Increase `--ddp_timeout` value
+     - Verify network connectivity and firewall settings
 
-3. **数据加载缓慢**:
-   - **症状**: 训练过程中 GPU 利用率低
-   - **解决方案**:
-     - 调整 `--dataloader_num_workers`
-     - 优化 `--preprocessing_num_workers`
-     - 使用更快的存储设备
-     - 预先处理和缓存数据
+3. **Slow Data Loading**:
+   - **Symptom**: Low GPU utilization during training
+   - **Solution**:
+     - Adjust `--dataloader_num_workers`
+     - Optimize `--preprocessing_num_workers`
+     - Use faster storage devices
+     - Pre-process and cache data
 
-## 配置相关问题
-1. **DeepSpeed 配置错误**:
-   - **症状**: DeepSpeed 初始化失败
-   - **检查项**:
-     - 确认 JSON 配置文件语法正确
-     - 验证 ZeRO 阶段与模型大小的匹配
-     - 检查 optimizer 和 scheduler 配置
-     - 确保 batch size 设置一致
+## Configuration Related Issues
+1. **DeepSpeed Configuration Errors**:
+   - **Symptom**: DeepSpeed initialization failure
+   - **Checkpoints**:
+     - Confirm JSON configuration file syntax is correct
+     - Verify ZeRO stage matches model size
+     - Check optimizer and scheduler configurations
+     - Ensure batch size settings are consistent
 
-2. **模型加载失败**:
-   - **症状**: 找不到模型文件或权重不匹配
-   - **解决方案**:
-     - 检查模型路径是否正确
-     - 验证 `trust_remote_code` 设置
-     - 确认模型和 tokenizer 的兼容性
-     - 检查缓存目录权限
+2. **Model Loading Failed**:
+   - **Symptom**: Model file not found or weights mismatch
+   - **Solution**:
+     - Check if the model path is correct
+     - Verify `trust_remote_code` setting
+     - Confirm model and tokenizer compatibility
+     - Check cache directory permissions
 
-## 评估相关问题
-1. **ELMB 评估失败**:
-   - **症状**: lm_eval 执行报错
-   - **解决方案**:
-     - 确认已正确安装 lm-evaluation-harness
-     - 检查模型路径和权重是否已合并
-     - 验证 CUDA 设备可用性
-     - 确保有足够的内存运行评估
+## Evaluation Related Issues
+1. **ELMB Evaluation Failure**:
+   - **Symptom**: lm_eval execution error
+   - **Solution**:
+     - Confirm lm-evaluation-harness is correctly installed
+     - Check if model path and weights have been merged
+     - Verify CUDA device availability
+     - Ensure sufficient memory to run evaluation
 
-2. **评估结果异常**:
-   - **症状**: 分数过低或不合理
-   - **检查项**:
-     - 确认使用了正确的合并模型
-     - 验证 tokenizer 设置
-     - 检查数据预处理是否正确
-     - 对比 baseline 模型的结果
+2. **Abnormal Evaluation Results**:
+   - **Symptom**: Score is too low or unreasonable
+   - **Checkpoints**:
+     - Confirm the correct merged model was used
+     - Verify tokenizer settings
+     - Check if data preprocessing is correct
+     - Compare with baseline model results
 
-## 环境与依赖问题
-1. **CUDA 版本不兼容**:
-   - **症状**: CUDA 相关错误或性能问题
-   - **解决方案**:
-     - 检查 PyTorch 和 CUDA 版本匹配
-     - 重新安装对应版本的 PyTorch
-     - 验证 GPU 驱动版本
-     - 检查 CUDA 工具包安装
+## Environment and Dependency Issues
+1. **CUDA Version Incompatibility**:
+   - **Symptom**: CUDA-related errors or performance issues
+   - **Solution**:
+     - Check PyTorch and CUDA version matching
+     - Reinstall the corresponding PyTorch version
+     - Verify GPU driver version
+     - Check CUDA toolkit installation
 
-2. **依赖版本冲突**:
-   - **症状**: 导入错误或功能异常
-   - **解决方案**:
-     - 严格按照 requirements.txt 安装
-     - 使用独立的虚拟环境
-     - 检查关键依赖的版本兼容性
-     - 清理旧版本的缓存文件
+2. **Dependency Version Conflicts**:
+   - **Symptom**: Import errors or functional anomalies
+   - **Solution**:
+     - Strictly follow requirements.txt for installation
+     - Use isolated virtual environments
+     - Check key dependency version compatibility
+     - Clear old version cache files
 
-## 调试工具与方法
-1. **日志分析**:
-   - **训练日志**: 检查 `log/` 目录下的文件
-   - **错误日志**: 查看 `.err` 文件的详细错误信息
-   - **WandB 监控**: 观察损失曲线和性能指标
-   - **系统监控**: 使用 `htop`, `nvidia-smi` 监控资源
+## Debugging Tools and Methods
+1. **Log Analysis**:
+   - **Training Logs**: Check files in the `log/` directory
+   - **Error Logs**: View detailed error information in `.err` files
+   - **WandB Monitoring**: Observe loss curves and performance metrics
+   - **System Monitoring**: Use `htop`, `nvidia-smi` to monitor resources
 
-2. **逐步调试**:
-   - **小数据集测试**: 使用少量数据验证流程
-   - **单GPU训练**: 先在单GPU上验证配置
-   - **参数缩减**: 减小模型或批次大小测试
-   - **中间输出**: 打印关键变量和状态
+2. **Step-by-step Debugging**:
+   - **Small Dataset Testing**: Use a small amount of data to verify the process
+   - **Single GPU Training**: First verify the configuration on a single GPU
+   - **Parameter Reduction**: Reduce model or batch size for testing
+   - **Intermediate Output**: Print key variables and states
 
-## 性能优化建议
-1. **训练速度优化**:
-   - 选择合适的精度模式 (bf16/fp16)
-   - 调整数据并行和模型并行策略
-   - 优化数据预处理和加载流程
-   - 使用 gradient checkpointing 平衡内存和速度
+## Performance Optimization Suggestions
+1. **Training Speed Optimization**:
+   - Select appropriate precision mode (bf16/fp16)
+   - Adjust data parallelism and model parallelism strategies
+   - Optimize data preprocessing and loading processes
+   - Use gradient checkpointing to balance memory and speed
 
-2. **内存使用优化**:
-   - 使用适当的 ZeRO 阶段
-   - 启用 activation checkpointing
-   - 调整 batch size 和序列长度
-   - 考虑使用 CPU offloading
+2. **Memory Usage Optimization**:
+   - Use appropriate ZeRO stages
+   - Enable activation checkpointing
+   - Adjust batch size and sequence length
+   - Consider using CPU offloading
 
-## 常见错误代码
-1. **错误码 137**: 内存不足被系统杀死
-   - 解决: 减少内存使用或增加系统内存
+## Common Error Codes
+1. **Error Code 137**: Out of memory, killed by system
+   - Solution: Reduce memory usage or increase system memory
 
-2. **错误码 1**: 一般性错误
-   - 解决: 检查详细错误日志，通常是配置或数据问题
+2. **Error Code 1**: General error
+   - Solution: Check detailed error logs, usually a configuration or data issue
 
-3. **错误码 2**: 文件未找到
-   - 解决: 检查所有文件路径是否正确
+3. **Error Code 2**: File not found
+   - Solution: Check if all file paths are correct
 
-## 应急处理流程
-1. **训练中断处理**:
-   - 检查最新的检查点
-   - 使用 `--resume_from_checkpoint` 恢复
-   - 验证恢复后的训练状态
-   - 监控是否有数据或状态异常
+## Emergency Handling Process
+1. **Training Interruption Handling**:
+   - Check the latest checkpoint
+   - Use `--resume_from_checkpoint` to resume
+   - Verify training status after resumption
+   - Monitor for data or status anomalies
 
-2. **结果异常处理**:
-   - 对比多个检查点的结果
-   - 重新运行关键步骤验证
-   - 检查随机种子和数据顺序
-   - 与基准结果进行对比分析
+2. **Abnormal Result Handling**:
+   - Compare results from multiple checkpoints
+   - Rerun critical steps for verification
+   - Check random seed and data order
+   - Compare with baseline results
 
-## 社区支持渠道
-1. **官方渠道**:
-   - GitHub Issues: 技术问题和 bug 报告
-   - Discord: 实时讨论和快速帮助
-   - 文档: 查阅最新的使用指南
+## Community Support Channels
+1. **Official Channels**:
+   - GitHub Issues: Technical questions and bug reports
+   - Discord: Real-time discussions and quick help
+   - Documentation: Refer to the latest user guide
 
-2. **调试信息收集**:
-   - 系统环境信息 (OS, CUDA, Python 版本)
-   - 完整的错误日志
-   - 使用的配置文件
-   - 重现问题的最小示例
+2. **Debugging Information Collection**:
+   - System environment information (OS, CUDA, Python version)
+   - Complete error logs
+   - Used configuration files
+   - Minimal example to reproduce the issue

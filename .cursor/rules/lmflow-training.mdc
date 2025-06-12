@@ -9,40 +9,40 @@ globs: ["train.sh", "examples/finetune*.py", "examples/dpo*.py", "examples/raft*
 always: true
 ---
 
-# LMFlow 训练与微调最佳实践
+# LMFlow Training and Fine-tuning Best Practices
 
-## 微调策略理解
+## Fine-tuning Strategy Understanding
 1. **DoRA (Weight-Decomposed Low-Rank Adaptation)**:
-   - 项目主要使用的微调方法，比 LoRA 更高效
-   - 固定超参数：`learning_rate=1e-5`, `lora_r=16`, `num_train_epochs=1`
-   - 使用 `--use_dora 1` 启用，配合 `--lora_target_modules` 指定目标层
+   - The main fine-tuning method used in this project, more efficient than LoRA
+   - Fixed hyperparameters: `learning_rate=1e-5`, `lora_r=16`, `num_train_epochs=1`
+   - Enable using `--use_dora 1`, with `--lora_target_modules` to specify target layers
 
-2. **其他支持的方法**:
-   - **DPO (Direct Preference Optimization)**: 用于人类偏好对齐
-   - **Iterative DPO**: 迭代式偏好优化
-   - **RAFT**: 用于检索增强生成的对齐方法
-   - **Reward Modeling**: 奖励模型训练
+2. **Other Supported Methods**:
+   - **DPO (Direct Preference Optimization)**: Used for human preference alignment
+   - **Iterative DPO**: Iterative preference optimization
+   - **RAFT**: Alignment method for retrieval-augmented generation
+   - **Reward Modeling**: Reward model training
 
-## 训练配置管理
-1. **DeepSpeed 配置**:
-   - 根据 GPU 内存选择合适的 ZeRO 策略
-   - `ds_config_zero0_no_offload.json`: 小模型，多 GPU
-   - `ds_config_zero2.json`: 中等模型，参数分片
-   - `ds_config_zero3.json`: 大模型，完全分片
+## Training Configuration Management
+1. **DeepSpeed Configuration**:
+   - Select appropriate ZeRO strategy based on GPU memory
+   - `ds_config_zero0_no_offload.json`: Small models, multiple GPUs
+   - `ds_config_zero2.json`: Medium models, parameter sharding
+   - `ds_config_zero3.json`: Large models, full sharding
 
-2. **超参数固定要求**:
-   - 为了消除超参数的干扰因素，必须保持：
+2. **Fixed Hyperparameter Requirements**:
+   - To eliminate hyperparameter interference, the following must be maintained:
    - `num_train_epochs = 1`
    - `learning_rate = 1e-5`  
    - `lora_r = 16`
 
-3. **数据处理**:
-   - 支持最多 10B tokens 的训练数据
-   - 使用 `--block_size 1024` 控制序列长度
-   - 通过 `--preprocessing_num_workers` 优化数据预处理
+3. **Data Processing**:
+   - Supports up to 10B tokens of training data
+   - Use `--block_size 1024` to control sequence length
+   - Optimize data preprocessing via `--preprocessing_num_workers`
 
-## 训练脚本使用
-1. **标准训练流程**:
+## Training Script Usage
+1. **Standard Training Process**:
    ```bash
    bash train.sh \
      --model_name_or_path [MODEL_PATH] \
@@ -50,29 +50,29 @@ always: true
      --output_dora_path [OUTPUT_PATH]
    ```
 
-2. **关键参数设置**:
-   - `--per_device_train_batch_size`: 根据 GPU 内存调整
-   - `--gradient_accumulation_steps`: 有效增大 batch size
-   - `--save_steps`: 检查点保存频率
-   - `--logging_steps`: 日志记录频率
+2. **Key Parameter Settings**:
+   - `--per_device_train_batch_size`: Adjust based on GPU memory
+   - `--gradient_accumulation_steps`: Effectively increase batch size
+   - `--save_steps`: Checkpoint saving frequency
+   - `--logging_steps`: Logging frequency
 
-3. **断点续训**:
-   - 使用 `--resume_from_checkpoint [CHECKPOINT_PATH]`
-   - 检查点路径格式：`[model-dir]/checkpoint-[index]`
+3. **Resume Training**:
+   - Use `--resume_from_checkpoint [CHECKPOINT_PATH]`
+   - Checkpoint path format: `[model-dir]/checkpoint-[index]`
 
-## 验证与评估
-1. **训练时验证**:
-   - `--validation_split_percentage 5`: 使用 5% 数据做验证
-   - `--eval_strategy steps`: 按步数评估
-   - `--eval_steps 20`: 每 20 步评估一次
+## Validation and Evaluation
+1. **In-training Validation**:
+   - `--validation_split_percentage 5`: Use 5% of data for validation
+   - `--eval_strategy steps`: Evaluate by steps
+   - `--eval_steps 20`: Evaluate every 20 steps
 
-2. **ELMB 基准测试**:
-   - 使用 `lm-evaluation-harness` 进行评估
-   - 测试任务：`elmb_roleplay`, `elmb_reasoning`, `elmb_functioncalling`, `elmb_chatrag`
-   - 评估前需要合并 DoRA 权重到基模型
+2. **ELMB Benchmark Testing**:
+   - Use `lm-evaluation-harness` for evaluation
+   - Test tasks: `elmb_roleplay`, `elmb_reasoning`, `elmb_functioncalling`, `elmb_chatrag`
+   - DoRA weights need to be merged into the base model before evaluation
 
-## 模型管理
-1. **权重合并**:
+## Model Management
+1. **Weight Merging**:
    ```bash
    bash ./scripts/run_merge_dora.sh \
      --model_name_or_path [BASE_MODEL] \
@@ -80,22 +80,22 @@ always: true
      --output_model_path [MERGED_PATH]
    ```
 
-2. **模型上传**:
-   - 参考 `example_upload_peft_model.py`
-   - 上传到 HuggingFace Hub 进行分享
+2. **Model Upload**:
+   - Refer to `example_upload_peft_model.py`
+   - Upload to HuggingFace Hub for sharing
 
-## 性能优化建议
-1. **内存优化**:
-   - 使用适当的 ZeRO 策略
-   - 启用 gradient checkpointing
-   - 调整 batch size 和 accumulation steps
+## Performance Optimization Suggestions
+1. **Memory Optimization**:
+   - Use appropriate ZeRO strategies
+   - Enable gradient checkpointing
+   - Adjust batch size and accumulation steps
 
-2. **速度优化**:
-   - 使用 `bf16` 混合精度训练
-   - 调整 `dataloader_num_workers`
-   - 优化 `preprocessing_num_workers`
+2. **Speed Optimization**:
+   - Use `bf16` mixed precision training
+   - Adjust `dataloader_num_workers`
+   - Optimize `preprocessing_num_workers`
 
-3. **监控与调试**:
-   - 使用 WandB 监控训练过程
-   - 检查 `log/` 目录下的训练日志
-   - 关注内存和 GPU 利用率
+3. **Monitoring and Debugging**:
+   - Use WandB to monitor training process
+   - Check training logs in `log/` directory
+   - Pay attention to memory and GPU utilization
