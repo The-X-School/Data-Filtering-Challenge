@@ -34,4 +34,4 @@ with torch.no_grad():
 output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 print(f"Prompt: {test_prompt}")
-print(f"Model output: {output_text}") 
+print(f"Model output: {output_text}")
