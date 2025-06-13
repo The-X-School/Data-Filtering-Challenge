@@ -6,7 +6,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
 # Path to the fine-tuned model directory
-model_path = "my-llama-400m-climblab"  # Change if you used a different path
+model_path = "data4elm/Llama-400M-12L"
 
 # Load the tokenizer and model
 print(f"Loading model from {model_path}...")
@@ -18,7 +18,7 @@ if torch.cuda.is_available():
     model = model.to("cuda")
 
 # Sample prompt
-test_prompt = "What is the capital of France?"
+test_prompt = "Answer in a single sentence: What is the capital of France?"
 inputs = tokenizer(test_prompt, return_tensors="pt")
 if torch.cuda.is_available():
     inputs = {k: v.to("cuda") for k, v in inputs.items()}
