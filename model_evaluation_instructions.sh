@@ -1,8 +1,8 @@
 # Model evaluation instructions 
 #I changed a few lines of code, it worked when I ran it on command line on Mac
 
-git clone -b data4elm https://github.com/OptimalScale/LMFlow.git
-cd LMFlow
+git clone https://github.com/The-X-School/Data-Filtering-Challenge
+cd Data-Filtering-Challenge 
 conda create -n lmflow python=3.9 -y
 conda activate lmflow
 conda install mpi4py
@@ -32,7 +32,7 @@ bash ./scripts/run_merge_dora.sh \
 
 
 # Evaluation (I removed this line of code: `cache_dir=~/.cache` because it wasn't working):
-cd LMFlow/lm-evaluation-harness
+cd Data-Filtering-Challenge/lm-evaluation-harness
 pip install -e . 
 
 lm_eval --model hf \
