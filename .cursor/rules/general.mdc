@@ -5,11 +5,20 @@ alwaysApply: true
 ---
 # General Rules
 
+<<<<<<< HEAD
 ## Core Principles
 1.  **Communication Language**: We communicate and discuss in **English**, especially for .mdc files in .cursor/rules. Please remember to use English for our communication.
 2.  **Code Language**: All code, comments, and documentation in the project must be in **English**.
 3.  **YOLO Mode**: All commands to be executed will run automatically in YOLO mode by default, without requiring your approval.
 4.  **Prohibit Batch Modification**: It is strictly forbidden to use `sed`, `awk`, or other similar scripting tools for batch code replacement. All modifications should be made individually to ensure accuracy.
+=======
+Core Principles
+	1.	Communication Language: All communication and discussion—especially in ‎⁠.cursor/rules⁠ ‎⁠.mdc⁠ files—must be in English for clarity and collaboration.
+	2.	Code Language: All code, comments, and documentation in the project must be written in English.
+	3.	YOLO Mode: All commands should be executed automatically by default (YOLO mode), without waiting for manual approval.
+	4.	No Bulk Modifications: It is strictly forbidden to use ‎⁠sed⁠, ‎⁠awk⁠, or similar scripting tools for bulk code replacements. All changes must be made individually to ensure accuracy.
+    5.  Format: All complex writing and deeper explaination has to be written in Markdown Format when applicable. 
+>>>>>>> 3d7fc0be02cb59a756057c3b9c2e7cd71dd9036b
 
 ## Workflow
 1.  **Understand Requirements**: Before coding, please thoroughly analyze my requirements and think from different perspectives to ensure a complete understanding of the problem's essence.
