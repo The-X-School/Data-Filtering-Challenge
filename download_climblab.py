@@ -9,9 +9,8 @@ output_dir = "data/climblab_sample"
 os.makedirs(output_dir, exist_ok=True)
 
 # Load the ClimbLab dataset (default split)
-dataset = load_dataset("nvidia/ClimbLab", split="train")
+dataset = load_dataset("nvidia/ClimbLab", split="train", streaming=True)
 
-# Save the first 100 samples as a demonstration
 sample = dataset.select(range(100))
 sample_path = os.path.join(output_dir, "climblab_sample.jsonl")
 sample.to_json(sample_path, orient="records", lines=True)
