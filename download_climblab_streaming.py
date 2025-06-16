@@ -7,6 +7,6 @@ from datasets import load_dataset, IterableDataset
 
 # Login using e.g. `huggingface-cli login` to access this dataset
 ds = load_dataset("nvidia/ClimbLab", split="train", streaming=True)
-first_100 = [x for _, x in zip(range(100), ds)]
+first_1000000 = [x for _, x in zip(range(1000000), ds)]
 
-print(first_100)
+print(first_1000000)

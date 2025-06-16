@@ -15,7 +15,7 @@ os.makedirs(output_dir, exist_ok=True)
 dataset = load_dataset("OptimalScale/ClimbLab", split="train", streaming=True)
 
 # sample = dataset.select(range(100)) doesn't work with streaming dataset
-sample = list(islice(dataset, 100))
+sample = list(islice(dataset, 1000000))
 for ex in sample[:3]:
     print(ex)
 
@@ -41,4 +41,4 @@ sample_path = os.path.join(output_dir, "climblab_sample.json")
 with open(sample_path, "w", encoding="utf-8") as f:
     json.dump(formatted_sample, f, ensure_ascii=False, indent=2)
 
-print(f"Downloaded and saved 100 samples from ClimbLab to {sample_path}") 
+print(f"Downloaded and saved 1000000 samples from ClimbLab to {sample_path}") 
