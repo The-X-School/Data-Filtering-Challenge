@@ -25,10 +25,10 @@ cd Data-Filtering-Challenge/lm-evaluation-harness
 pip install -e . 
 
 # Note: The command below evaluates the baseline model.
-# When you have your own fine-tuned model, replace 'data4elm/Llama-400M-12L'
-# with the path to your merged model directory.
+# When you have your own fine-tuned model, replace 'data4elm/Llama-400M-12L' 
+# with 'output_models/dora_merged' (path to your merged model directory)
 lm_eval --model hf \
-    --model_args pretrained=data4elm/Llama-400M-12L,trust_remote_code=True \
+    --model_args pretrained=output_models/dora_merged,trust_remote_code=True \
     --tasks elmb_roleplay,elmb_reasoning,elmb_functioncalling,elmb_chatrag \
     --device cuda:0 \
     --batch_size 1 \
