@@ -1,6 +1,8 @@
+# whole thing
 from huggingface_hub import login
 login()
 
+import datasets
 from datasets import load_dataset, IterableDataset
 
 # Login using e.g. `huggingface-cli login` to access this dataset
