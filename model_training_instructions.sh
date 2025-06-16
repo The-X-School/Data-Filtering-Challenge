@@ -32,4 +32,4 @@ bash train.sh
 bash ./scripts/run_merge_dora.sh \
  --model_name_or_path data4elm/Llama-400M-12L \
  --lora_model_path output_models/finetune \
- --output_model_path output_models/dora_merged \
+ --output_model_path output_models/dora_merged

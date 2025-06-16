@@ -16,7 +16,7 @@ cd Data-Filtering-Challenge
 
 # install conda
 wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-bash miniconda.sh -b -p $HOME/miniconda
+bash miniconda.sh -b -f -p $HOME/miniconda
 eval "$($HOME/miniconda/bin/conda shell.bash hook)"
 
 # activate conda environment
@@ -25,10 +25,10 @@ conda activate lmflow
 
 # install packages
 conda install mpi4py
-pip install -e .
-pip install py-cpuinfo
-pip install -r requirements.txt
+pip install -e . -y
+pip install py-cpuinfo -y
+pip install -r requirements.txt -y
 
 # install wandb, make sure you entered your api key
-pip install wandb
+pip install wandb -y
 wandb login
