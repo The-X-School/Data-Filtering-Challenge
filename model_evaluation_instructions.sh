@@ -4,6 +4,11 @@
 git clone https://github.com/The-X-School/Data-Filtering-Challenge
 cd Data-Filtering-Challenge 
 
+# install conda
+curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+source ~/miniconda3/bin/activate
+
 conda create -n lmflow python=3.9 -y
 conda activate lmflow
 conda install mpi4py
@@ -11,6 +16,7 @@ pip install -e .
 
 # extra package to install if needed:
 pip install py-cpuinfo
+pip3 install -r requirements.txt
 
 # Evaluation (I removed this line of code: `cache_dir=~/.cache` because it wasn't working):
 cd Data-Filtering-Challenge/lm-evaluation-harness
