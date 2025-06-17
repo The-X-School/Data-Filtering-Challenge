@@ -14,18 +14,22 @@ set -e
 # install conda
 wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 bash miniconda.sh -b -f -p $HOME/miniconda
+
+# Initialize conda for shell interaction
 eval "$($HOME/miniconda/bin/conda shell.bash hook)"
+$HOME/miniconda/bin/conda init bash
+source ~/.bashrc
 
 # activate conda environment
 conda create -n lmflow python=3.9 -y
 conda activate lmflow
 
 # install packages
-conda install mpi4py
-pip install -e . -y
-pip install py-cpuinfo -y
-pip install -r requirements.txt -y
+conda install mpi4py -y
+pip install -e .
+pip install py-cpuinfo
+pip install -r requirements.txt
 
 # install wandb, make sure you entered your api key
-pip install wandb -y
+pip install wandb
 wandb login
