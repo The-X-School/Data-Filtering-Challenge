@@ -11,9 +11,6 @@ set -e
 # Then run this script using:
 # bash lambda_setup.sh
 
-
-cd Data-Filtering-Challenge
-
 # install conda
 wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 bash miniconda.sh -b -f -p $HOME/miniconda
