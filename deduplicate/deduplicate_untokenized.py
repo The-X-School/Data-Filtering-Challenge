@@ -66,7 +66,7 @@ def deduplicate(dataset, threshold=0.8, ngram_size=10):
         adjList[pair[0]].append(pair[1])
         adjList[pair[1]].append(pair[0])
     
-    print("Step 5: Connected Components Algorithm")
+    print("Step 5: Connected Components Algorithm...")
     filtered_dataset = []
     visited = [False] * len(dataset)
     for i in range(len(dataset)):
