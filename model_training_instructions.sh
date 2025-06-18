@@ -22,7 +22,7 @@ pip3 install -r requirements.txt
 # https://wandb.ai/authorize
 
 # Then run this code:
-export WANDB_API_KEY=<your_api_key>
+export WANDB_API_KEY=<WANDB KEY>
 pip install wandb
 wandb login
 
