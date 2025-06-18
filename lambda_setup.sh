@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+# this isn't working
+# for now just copy the code into terminal and run it manually
+# see model_training_instructions.sh or model_evaluation_instructions.sh for more details
+
 # first clone the github (type this in terminal manually): 
 # git clone https://github.com/The-X-School/Data-Filtering-Challenge
 # it will ask you to enter your user name and password, put github access key as password
