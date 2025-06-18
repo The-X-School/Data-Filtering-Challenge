@@ -1,5 +1,7 @@
+import farmhash #pip install pyfarmhash
 from collections import defaultdict
-from datasketch import MinHash, MinHashLSH #pip install datasketch
+from datasketch import MinHash, MinHashLSH #pip install 
+
 # this function is chatGPT generated, not me
 def deduplicate_lsh(dataset, num_perm=128, threshold=0.8):
     """
@@ -10,6 +12,7 @@ def deduplicate_lsh(dataset, num_perm=128, threshold=0.8):
     Returns:
         List of pairs (i, j) of document indices considered similar.
     """
+    print("Step 3.1:")
     # 1. Create MinHash objects for each document
     minhashes = []
     for tokens in dataset:
@@ -19,13 +22,16 @@ def deduplicate_lsh(dataset, num_perm=128, threshold=0.8):
         minhashes.append(m)
     
     # 2. Create LSH index
+    print("Step 3.2:")
     lsh = MinHashLSH(threshold=threshold, num_perm=num_perm)
     
     # 3. Insert documents into LSH
+    print("Step 3.3:")
     for i, m in enumerate(minhashes):
         lsh.insert(f"doc{i}", m)
     
     # 4. Query LSH for candidate pairs
+    print("Step 3.4:")
     candidates = set()
     for i, m in enumerate(minhashes):
         result = lsh.query(m)
@@ -54,8 +60,7 @@ def deduplicate(dataset, threshold=0.8, ngram_size=10):
     hashed_ngrams = [[] for _ in range(len(dataset))]
     for row in range(len(dataset)):
         for ngram in nGrams[row]:
-            token = " ".join(map(str, ngram))
-            hashed_ngrams[row].append(token)
+            hashed_ngrams[row].append(farmhash.hash64(" ".join(map(str, ngram))))
 
     print("Step 3: Comparing candidate documents...")
     edgeList = deduplicate_lsh(hashed_ngrams, threshold = threshold)
@@ -77,11 +82,13 @@ def deduplicate(dataset, threshold=0.8, ngram_size=10):
 
 if __name__ == "__main__":
     dataset = [
-    ["the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"],          # Doc 0
-    ["brown", "fox", "jumps", "over", "the", "lazy", "dog"],        # Doc 1 (high overlap with 0)
-    ["the", "slow", "white", "cat", "sleeps", "under", "the", "warm", "blanket"],     # Doc 2 (not similar)
-    ["quick", "brown", "fox", "jumps", "over", "the", "dog"],                        # Doc 3 (subset of 0)
-    ["the", "slow", "white", "cat", "sleeps", "under", "the", "blanket"],                           # Doc 4 (subset of 2)
+    ["the", "cat", "sat", "on", "the", "mat"],
+    ["the", "cat", "sat", "on", "a", "mat"],
+    ["dogs", "are", "great", "pets"],
+    ["cats", "are", "great", "pets"]
     ]
-    filtered_dataset = deduplicate(dataset, threshold = 0.5, ngram_size=2)
+    print("Loaded Dataset")
+    print("Dataset Length:", len(dataset))
+    filtered_dataset = deduplicate(dataset, threshold = 0.4, ngram_size=2)
     print("Filtered Dataset:", filtered_dataset)
+    print("Filtered Dataset Length:", len(filtered_dataset))
