@@ -89,6 +89,9 @@ class Dataset:
             data_files = [
                 x.absolute().as_posix()
                  for x in Path(self.dataset_path).glob("*.json")
+            ] + [
+                x.absolute().as_posix()
+                 for x in Path(self.dataset_path).glob("*.jsonl")
             ]
             logger.info(f"Data files: \n{data_files}")
 
