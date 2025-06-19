@@ -65,6 +65,7 @@ deepspeed ${deepspeed_args} \
     --deepspeed configs/ds_config_zero0_no_offload.json \
     --bf16 \
     --run_name ${exp_id} \
+    --report_to none \
     --validation_split_percentage 0 \
     --logging_steps 20 \
     --do_train \

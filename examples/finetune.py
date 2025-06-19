@@ -44,6 +44,8 @@ def main():
     else:
         model_args, data_args, pipeline_args = parser.parse_args_into_dataclasses()
 
+    pipeline_args.report_to = "none"
+
     # Initialization
     finetuner = AutoPipeline.get_pipeline(
         pipeline_name=pipeline_name,

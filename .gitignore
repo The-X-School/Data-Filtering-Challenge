@@ -1,5 +1,8 @@
 # Initially taken from Github's Python gitignore file
 
+group_lambda_key
+data/climblab_first_million.jsonl   
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
