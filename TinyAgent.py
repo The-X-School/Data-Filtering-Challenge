@@ -1,35 +1,47 @@
+# filter_with_tinyagent.py
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import json
 
-# Set paths and device
-MODEL_DIR = "./tinyagent-1.1b"
+MODEL_DIR = "/Users/zoesun/Downloads/Data-Filtering-Challenge/tinyagent-1.1b"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-try:
-    # Try to load the local model first
-    print(f"Loading model from {MODEL_DIR}...")
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR)
-    model = AutoModelForCausalLM.from_pretrained(MODEL_DIR, torch_dtype=torch.float16 if DEVICE == "cuda" else torch.float32).to(DEVICE)
-    print("Model loaded successfully!")
-except Exception as e:
-    print(f"Error loading local model: {e}")
-    print("Trying to load a public model instead...")
-    
-    # Fallback to a public model
-    try:
-        model_name = "microsoft/DialoGPT-medium"  # A smaller, public model
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(model_name)
-        print(f"Loaded {model_name} successfully!")
-    except Exception as e2:
-        print(f"Error loading public model: {e2}")
-        exit(1)
+# Load model & tokenizer from disk without connecting to Hugging Face
+tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, local_files_only=True)
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_DIR,
+    local_files_only=True,
+    torch_dtype=torch.float16 if DEVICE == "cuda" else torch.float32
+).to(DEVICE)
 
-# Run a test generation
-prompt = "How does photosynthesis work?"
-inputs = tokenizer(prompt, return_tensors="pt").to(DEVICE)
-outputs = model.generate(**inputs, max_new_tokens=100)
+# Define filter function
+def is_instruction_useful(instruction):
+    prompt = f"Decide whether the following instruction is useful for AI training. Reply only with 'Yes' or 'No'.\nInstruction: {instruction}"
+    inputs = tokenizer(prompt, return_tensors="pt").to(DEVICE)
+    outputs = model.generate(**inputs, max_new_tokens=10)
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True).lower()
+    return "yes" in response and "no" not in response
 
-print("\n--- Generated Response ---")
-print(tokenizer.decode(outputs[0], skip_special_tokens=True))
-print("--------------------------")
+# Filter data from climblab_raw.jsonl
+filtered = []
+with open("climblab_raw.jsonl", "r") as infile:
+    for i, line in enumerate(infile):
+        try:
+            item = json.loads(line)
+            instruction = item.get("instruction") or item.get("prompt") or str(item)
+            print(f"[{i+1}] Checking: {instruction}")
+
+            if is_instruction_useful(instruction):
+                print("✅ Kept")
+                filtered.append({"instruction": instruction})
+            else:
+                print("❌ Rejected")
+        except Exception as e:
+            print(f"⚠️ Error on line {i+1}: {e}")
+
+# Save filtered data
+with open("climblab_filtered.jsonl", "w") as f:
+    for item in filtered:
+        f.write(json.dumps(item) + "\n")
+
+print(f"\n✅ Saved {len(filtered)} filtered instructions to climblab_filtered.jsonl")

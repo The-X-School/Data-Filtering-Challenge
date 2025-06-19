@@ -1,0 +1,63 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Project Rules
+## Always apply
+
+### Project Structure
+- Keep models in appropriate directories
+- Maintain clear separation of concerns
+- Follow consistent naming conventions
+- Keep scripts organized by purpose
+- Maintain clear documentation structure
+- Separate evaluation and training code
+
+### Data Management
+- Use appropriate data versioning
+- Document data preprocessing steps
+- Keep data pipeline reproducible
+- Validate input data formats
+- Maintain data privacy requirements
+- Document data augmentation methods
+
+### Model Management
+- Version control model checkpoints
+- Document model architectures
+- Track experiment configurations
+- Log training metrics
+- Maintain model cards
+- Document model limitations
+
+### Evaluation
+- Use consistent evaluation metrics
+- Document evaluation procedures
+- Maintain benchmark results
+- Track performance regressions
+- Document evaluation environment
+- Keep evaluation scripts reproducible
+
+### Dependencies
+- Pin dependency versions
+- Document environment setup
+- Keep requirements.txt updated
+- Document GPU requirements
+- Maintain virtual environment
+- Track dependency conflicts
+
+### CI/CD
+- Run tests before merging
+- Validate configuration files
+- Check code formatting
+- Run security checks
+- Validate documentation
+- Check for memory leaks
+
+### Documentation
+- Keep README updated
+- Document setup procedures
+- Maintain API documentation
+- Document known issues
+- Keep changelog updated
+- Document deployment procedures

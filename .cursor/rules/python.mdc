@@ -1,0 +1,53 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Python Rules
+## Always apply
+
+### Imports
+- Sort imports using isort standards
+- Group imports into: standard library, third-party, local
+- Remove unused imports
+- Use absolute imports for project modules
+
+### Code Style
+- Follow PEP 8 guidelines
+- Maximum line length: 100 characters
+- Use type hints for function parameters and return values
+- Use docstrings for classes and functions (Google style)
+- Use f-strings for string formatting
+- Use snake_case for functions and variables
+- Use PascalCase for classes
+
+### ML-specific
+- Use torch.device for device management
+- Initialize random seeds for reproducibility
+- Use context managers for torch.no_grad() when appropriate
+- Log model parameters and hyperparameters
+- Use proper error handling for CUDA operations
+
+### Testing
+- Place test files in appropriate directories
+- Use descriptive test names
+- Include assertions for expected outputs
+- Mock external dependencies
+
+### Documentation
+- Update docstrings when modifying functions
+- Include examples in docstrings where appropriate
+- Document any assumptions in complex algorithms
+- Add inline comments for complex logic
+
+### Performance
+- Use vectorized operations where possible
+- Profile memory usage for large models
+- Implement proper cleanup for GPU memory
+- Use appropriate batch sizes
+
+### Security
+- No hardcoded credentials
+- Use environment variables for sensitive data
+- Validate input data
+- Sanitize file paths

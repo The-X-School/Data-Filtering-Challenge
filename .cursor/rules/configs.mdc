@@ -1,0 +1,46 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Configuration Rules
+## Always apply
+
+### JSON Configs
+- Use consistent indentation (2 spaces)
+- Include comments for non-obvious settings
+- Validate JSON schema before commits
+- Use meaningful key names
+- Group related configurations
+- Keep consistent structure across similar configs
+
+### YAML Configs
+- Use consistent indentation (2 spaces)
+- Document all configuration options
+- Use anchors and aliases for repeated values
+- Keep environment-specific configs separate
+- Include default values where appropriate
+- Validate YAML syntax
+
+### DeepSpeed Configs
+- Document memory requirements
+- Specify appropriate optimization level
+- Include all necessary parameters
+- Validate against DeepSpeed schema
+- Document hardware requirements
+- Keep staging and production configs separate
+
+### Accelerate Configs
+- Document GPU requirements
+- Specify appropriate distributed strategy
+- Include all necessary parameters
+- Keep consistent with project requirements
+- Document memory requirements
+- Include fallback configurations
+
+### Version Control
+- Track configuration changes
+- Document breaking changes
+- Include example configurations
+- Keep backup of working configs
+- Version configuration files appropriately
