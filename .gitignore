@@ -1,6 +1,8 @@
 # Initially taken from Github's Python gitignore file
 
+id_ed25519_clyra
 group_lambda_key
+climblab_first_million.jsonl 
 data/climblab_first_million.jsonl   
 
 # Byte-compiled / optimized / DLL files
