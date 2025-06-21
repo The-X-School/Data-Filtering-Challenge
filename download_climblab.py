@@ -1,44 +1,32 @@
-#!/usr/bin/env python
-# Script to download the ClimbLab dataset from Hugging Face
-
 from datasets import load_dataset
-from itertools import islice
-import os
+from tqdm import tqdm
 import json
 
-# Set output directory
-output_dir = "data"
-os.makedirs(output_dir, exist_ok=True)
+TOKEN = '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'
 
-# Load the ClimbLab dataset (default split)
-# use text dataset instead of tokenized dataset
-dataset = load_dataset("OptimalScale/ClimbLab", split="train", streaming=True)
+# Load dataset without streaming, but we'll limit the data
+print("Loading dataset...")
+ds = load_dataset(
+    "OptimalScale/ClimbLab", 
+    split="train", 
+    token=TOKEN,
+    cache_dir="./cache"  # Specify cache directory
+)
 
-# sample = dataset.select(range(100)) doesn't work with streaming dataset
-sample = list(islice(dataset, 1000000))
-for ex in sample[:3]:
-    print(ex)
+print(f"Total dataset size: {len(ds)}")
 
-'''
-format the data to look like this:  
-{
-  "type": "text_only",
-  "instances": [
-    {  "text": "SAMPLE_TEXT_1" },
-    {  "text": "SAMPLE_TEXT_2" },
-    {  "text": "SAMPLE_TEXT_3" },
-  ]
-}
-'''
-instances = [{"text": item["text"]} for item in sample]
+# Take only the first 1M entries
+print("Selecting first 1,000,000 entries...")
+first_1000000_ds = ds.select(range(min(1000000, len(ds))))
 
-formatted_sample = {
-    "type": "text_only",
-    "instances": instances
-}
+print(f"Selected {len(first_1000000_ds)} entries")
 
-sample_path = os.path.join(output_dir, "climblab_sample.json")
-with open(sample_path, "w", encoding="utf-8") as f:
-    json.dump(formatted_sample, f, ensure_ascii=False, indent=2)
+# Save to file if needed
+print("Saving data...")
+output_file = "climblab_1m.jsonl"
 
-print(f"Downloaded and saved 1000000 samples from ClimbLab to {sample_path}") 
+with open(output_file, 'w', encoding='utf-8') as f:
+    for i, entry in enumerate(tqdm(first_1000000_ds, desc="Saving entries")):
+        f.write(json.dumps(entry, ensure_ascii=False) + '\n')
+        
+print(f"Data saved to {output_file}")
