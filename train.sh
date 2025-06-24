@@ -57,7 +57,7 @@ deepspeed ${deepspeed_args} \
     --num_train_epochs 1 \
     --learning_rate 1e-4 \
     --block_size 1024 \
-    --per_device_train_batch_size 1 \
+    --per_device_train_batch_size 24 \
     --use_dora 1 \
     --lora_r 16 \
     --lora_target_modules="embed_tokens,q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj,lm_head" \
@@ -72,6 +72,6 @@ deepspeed ${deepspeed_args} \
     --ddp_timeout 72000 \
     --save_steps 5000 \
     --dataloader_num_workers 1 \
-    --preprocessing_num_workers 4 \
+    --preprocessing_num_workers 128 \
     | tee ${log_dir}/train.log \
     2> ${log_dir}/train.err
