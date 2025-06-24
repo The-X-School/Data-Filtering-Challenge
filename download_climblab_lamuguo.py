@@ -11,8 +11,8 @@ parser = argparse.ArgumentParser(description="Download a subset of the ClimbLab 
 parser.add_argument(
     "--num_records",
     type=int,
-    default=1_000_000,
-    help="Number of records to download (approximate). Default: 1,000,000",
+    default=25_000,
+    help="Number of records to download (approximate). Default: 25,000",
 )
 parser.add_argument(
     "--output",
@@ -23,11 +23,10 @@ parser.add_argument(
 parser.add_argument(
     "--dataset",
     type=str,
-    default="nvidia/ClimbLab",
-    help="Dataset repo id to download from (default: nvidia/ClimbLab)",
+    default="OptimalScale/ClimbLab",
+    help="Dataset repo id to download from (default: OptimalScale/ClimbLab)",
 )
-args = parser.parse_args()
-
+args = parser.parse_args() 
 NUM_RECORDS = args.num_records
 OUTPUT_FILE = args.output
 DATASET_ID = args.dataset
