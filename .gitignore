@@ -195,3 +195,9 @@ tags
 lm_cache/
 
 output/
+
+# PreSelect classifier model
+PreSelect-classifier.bin
+
+# Filtered data outputs
+data/filtered_preselect/
