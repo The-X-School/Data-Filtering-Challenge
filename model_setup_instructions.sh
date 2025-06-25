@@ -17,4 +17,4 @@ pip install -e .
 
 # extra package to install if needed:
 pip install py-cpuinfo
-pip3 install -r requirements.txt
+pip install -r requirements.txt

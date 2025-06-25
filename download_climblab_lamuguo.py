@@ -11,8 +11,8 @@ parser = argparse.ArgumentParser(description="Download a subset of the ClimbLab 
 parser.add_argument(
     "--num_records",
     type=int,
-    default=25_000,
-    help="Number of records to download (approximate). Default: 25,000",
+    default=100_000,
+    help="Number of records to download (approximate). Default: 100,000",
 )
 parser.add_argument(
     "--output",
