@@ -1,0 +1,128 @@
+# Bayesian Optimization Configuration for DoRA Fine-tuning
+
+# Study Configuration
+study:
+  name: "dora_hyperparameter_optimization"
+  n_trials: 30
+  timeout: 43200  # 12 hours in seconds
+  enable_pruning: true
+  pruning_warmup_steps: 3
+
+# Model Configuration
+model:
+  base_model_path: "data4elm/Llama-400M-12L"
+  dataset_path: "data/filtered_output"
+  
+  # Fixed hyperparameters (cannot be changed per competition rules)
+  fixed_hyperparameters:
+    num_train_epochs: 1
+    learning_rate: 1e-5
+    lora_r: 16
+
+# Output Configuration
+output:
+  base_dir: "optimization_results"
+  models_dir: "optimization_models"
+  
+# Evaluation Configuration
+evaluation:
+  limit: 50  # Number of samples to evaluate for faster trials
+  device: "cuda:0"  # Change to "cpu" if no GPU available
+  tasks:
+    - "elmb_roleplay"
+    - "elmb_reasoning" 
+    - "elmb_functioncalling"
+    - "elmb_chatrag"
+
+# Hyperparameter Search Space
+hyperparameter_ranges:
+  # Training configuration
+  per_device_train_batch_size:
+    type: "int"
+    low: 1
+    high: 8
+    
+  gradient_accumulation_steps:
+    type: "int"
+    low: 1
+    high: 16
+    
+  # Model architecture
+  block_size:
+    type: "categorical"
+    choices: [512, 1024, 2048]
+    
+  lora_alpha:
+    type: "int"
+    low: 8
+    high: 64
+    
+  lora_dropout:
+    type: "float"
+    low: 0.0
+    high: 0.3
+    
+  # Optimization
+  warmup_steps:
+    type: "int"
+    low: 0
+    high: 100
+    
+  weight_decay:
+    type: "float"
+    low: 0.0
+    high: 0.1
+    
+  lr_scheduler_type:
+    type: "categorical"
+    choices: ["linear", "cosine", "constant"]
+    
+  # Data processing
+  dataloader_num_workers:
+    type: "int"
+    low: 1
+    high: 4
+    
+  preprocessing_num_workers:
+    type: "int"
+    low: 32
+    high: 256
+    step: 32
+    
+  # DeepSpeed configuration
+  deepspeed_config:
+    type: "categorical"
+    choices: 
+      - "configs/ds_config_zero0_no_offload.json"
+      - "configs/ds_config_zero2.json"
+      
+  # Logging and checkpointing
+  logging_steps:
+    type: "int"
+    low: 10
+    high: 50
+    
+  save_steps:
+    type: "int"
+    low: 1000
+    high: 10000
+    step: 1000
+    
+  # Validation
+  validation_split_percentage:
+    type: "float"
+    low: 0.0
+    high: 10.0
+
+# Resource Management
+resources:
+  training_timeout: 3600  # 1 hour per training
+  evaluation_timeout: 1800  # 30 minutes per evaluation
+  merge_timeout: 600  # 10 minutes per merge operation
+  
+# Advanced Options
+advanced:
+  cleanup_intermediate_files: true
+  save_all_models: false  # Only save best models to save disk space
+  enable_early_stopping: true
+  parallel_evaluation: false  # Set to true if you have multiple GPUs 
