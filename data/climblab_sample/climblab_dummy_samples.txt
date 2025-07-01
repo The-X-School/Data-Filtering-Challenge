@@ -1,0 +1,70 @@
+=== Sample 1 (Cluster 0) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+This is a sample text from ClimbLab dataset for testing purposes.
+
+==================================================
+
+=== Sample 2 (Cluster 1) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+The ClimbLab dataset contains high-quality pre-training data.
+
+==================================================
+
+=== Sample 3 (Cluster 2) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+Language models can benefit from diverse training data.
+
+==================================================
+
+=== Sample 4 (Cluster 3) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+Text generation requires understanding of context and semantics.
+
+==================================================
+
+=== Sample 5 (Cluster 4) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+Machine learning models need large amounts of training data.
+
+==================================================
+
+=== Sample 6 (Cluster 0) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+Natural language processing is a key area of AI research.
+
+==================================================
+
+=== Sample 7 (Cluster 1) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+The quality of training data significantly impacts model performance.
+
+==================================================
+
+=== Sample 8 (Cluster 2) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+Clustering algorithms can help organize large datasets.
+
+==================================================
+
+=== Sample 9 (Cluster 3) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+Data filtering techniques improve training efficiency.
+
+==================================================
+
+=== Sample 10 (Cluster 4) ===
+Source: dummy_data
+Note: This is dummy data for testing when ClimbLab download fails
+Pre-trained models serve as good starting points for fine-tuning.
+
+==================================================
+

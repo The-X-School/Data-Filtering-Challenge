@@ -1,0 +1,80 @@
+{
+  "type": "text_only",
+  "instances": [
+    {
+      "text": "This is a sample text from ClimbLab dataset for testing purposes.",
+      "sample_id": 0,
+      "cluster_id": 0,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    },
+    {
+      "text": "The ClimbLab dataset contains high-quality pre-training data.",
+      "sample_id": 1,
+      "cluster_id": 1,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    },
+    {
+      "text": "Language models can benefit from diverse training data.",
+      "sample_id": 2,
+      "cluster_id": 2,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    },
+    {
+      "text": "Text generation requires understanding of context and semantics.",
+      "sample_id": 3,
+      "cluster_id": 3,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    },
+    {
+      "text": "Machine learning models need large amounts of training data.",
+      "sample_id": 4,
+      "cluster_id": 4,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    },
+    {
+      "text": "Natural language processing is a key area of AI research.",
+      "sample_id": 5,
+      "cluster_id": 0,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    },
+    {
+      "text": "The quality of training data significantly impacts model performance.",
+      "sample_id": 6,
+      "cluster_id": 1,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    },
+    {
+      "text": "Clustering algorithms can help organize large datasets.",
+      "sample_id": 7,
+      "cluster_id": 2,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    },
+    {
+      "text": "Data filtering techniques improve training efficiency.",
+      "sample_id": 8,
+      "cluster_id": 3,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    },
+    {
+      "text": "Pre-trained models serve as good starting points for fine-tuning.",
+      "sample_id": 9,
+      "cluster_id": 4,
+      "source_file": "dummy_data",
+      "note": "This is dummy data for testing when ClimbLab download fails"
+    }
+  ],
+  "metadata": {
+    "source": "dummy_data",
+    "total_samples": 10,
+    "description": "Dummy samples for testing (ClimbLab download failed)"
+  }
+}
