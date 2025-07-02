@@ -1,5 +1,6 @@
 #designed to import from https://huggingface.co/datasets/OptimalScale/ClimbLab/tree/main
-
+#regmix but im lowk working on inputting now
+#need to install fastparquet beforehand jsyk 
 from huggingface_hub import hf_hub_download
 from huggingface_hub import login
 from huggingface_hub import list_repo_files
@@ -7,14 +8,16 @@ from huggingface_hub import get_hf_file_metadata
 from huggingface_hub import hf_hub_url
 import random
 import os
+import pandas as pd
 
 HF_TOKEN = "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"
 login(token=HF_TOKEN)
 
 #get the list of files in the dataset
 files = list_repo_files(repo_id="OptimalScale/ClimbLab", repo_type="dataset", token=HF_TOKEN)
-
-#print(files)
+print(f"file name: {files}")
+'''
+#find average size of cluster
 
 #cluster size is a list of lists, each list contains the size of the cluster and the order of the cluster
 cluster_sizes = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]
@@ -62,33 +65,61 @@ for cluster_index in range(len(cluster_sizes)):
     
 
 print(ordered_cluster_sizes)
-
 '''
+
+ordered_avg_cluster_file_sizes = [408642393.0, 2875032634.09, 2164786985.28, 1744217619.07, 2471566923.25, 1785179635.91, 1679482711.97, 658651974.49, 347071598.9, 3574917461.46, 913836075.79, 1999874016.68, 309743241.73, 413883453.09, 923521510.83, 1414205422.06, 2162286812.32, 1375350040.61, 1349084078.86, 2199706985.4]
+
+average_file_size = 1538552078.7395003
+#constants found in Find\ Average\ File\ size.py
+
 cluster_distribution = [0]*20
 
+total_size = 0
+
+print()
+
 for cluster in range(20):
-    cluster_distribution[cluster] = random.randint(0, 5)
-print(cluster_distribution)
+    #adjusts so that each file from a cluster is ~about the same size
+#    standardize = average_file_size/ ordered_avg_cluster_file_sizes[cluster]
+
+    cluster_distribution[cluster] = random.randint(0, 3) #*standardize    #randomly assign distribution size
+
+    # print(f"standardize {cluster+1}: {standardize}")
+
+    # total_size += cluster_distribution[cluster] * ordered_avg_cluster_file_sizes[cluster]   
+
+print(f"cluster_distribution: {cluster_distribution}")
 
 
+# print(f"\n Total size: {total_size/(1024*1024*1024)} GB")
+
+df_dt_totalsize = 0
+
+for i in range(20):
+    filename = files[2+i*100]
+    print(f"filename {filename}")
+    #download the dataset
+    dataset = hf_hub_download(
+        repo_id="OptimalScale/ClimbLab",
+        filename=filename,
+        repo_type="dataset",
+    )
+
+    dataframe_dataset = pd.read_parquet(dataset, engine = 'fastparquet')
 
 
-#download the dataset
-dataset = hf_hub_download(
-    repo_id="OptimalScale/ClimbLab",
-    filename="cluster_1_001.parquet",
-    subfolder="cluster_1",
-    repo_type="dataset",
-    token=HF_TOKEN
-)
+    #print the dataset
+    # print(dataframe_dataset)
 
-#print the dataset
-print(dataset)
+    first_1000_rows = dataframe_dataset[0:1000]
+    # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
+         # Get file size in bytes
 
+    df_dt_totalsize += first_1000_rows.size
+    
+    #convert to json + turn into another file
 
-# Get file size in bytes
-file_size_bytes = os.path.getsize(dataset)
-# Convert to more readable formats
-file_size_gb = file_size_bytes / (1024*1024*1024)
-print(f"File size: {file_size_gb:.2f} GB")
-'''
+    file_size_bytes = os.path.getsize(dataset)
+    print(f"\nCluster {i} \nFilename {filename}\nFile size: {first_1000_rows.size/1024:.2f}Kb \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb \n First 100 0 rows: {first_1000_rows} \n ")
+
+print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")

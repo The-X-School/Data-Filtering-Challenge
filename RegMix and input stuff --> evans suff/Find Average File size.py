@@ -1,3 +1,6 @@
+#made to calculate average size of cluster 
+#can be quickly modified for other metadata/size + input stuff
+#from optimal scale
 from huggingface_hub import hf_hub_download
 from huggingface_hub import login
 from huggingface_hub import list_repo_files
@@ -11,6 +14,10 @@ login(token=HF_TOKEN)
 
 #get the list of files in the dataset
 files = list_repo_files(repo_id="OptimalScale/ClimbLab", repo_type="dataset", token=HF_TOKEN)
+print(files)
+
+
+
 
 #find average size of cluster
 
@@ -64,4 +71,4 @@ print(ordered_cluster_sizes)
 for i in range(20):
     ordered_cluster_sizes[i] = ordered_cluster_sizes[i]/100
 
-print(ordered_cluster_sizes)
+print(f"average size: {ordered_cluster_sizes}")
