@@ -71,6 +71,7 @@ print(ordered_cluster_sizes)
 for i in range(20):
     ordered_cluster_sizes[i] = ordered_cluster_sizes[i]/100 # type: ignore
 
+<<<<<<< HEAD:RegMix/Find Average File size.py
 print(f"average size: {ordered_cluster_sizes}")
 
 
@@ -78,3 +79,6 @@ ordered_avg_cluster_file_sizes = [408642393.0, 2875032634.09, 2164786985.28, 174
 
 average_file_size = 1538552078.7395003
 #constants found in Find\ Average\ File\ size.py
+=======
+print(f"average size: {ordered_cluster_sizes}")
+>>>>>>> 9ddd845 (updated hf_climblab):RegMix and input stuff --> evans suff/Find Average File size.py
