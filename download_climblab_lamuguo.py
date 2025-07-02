@@ -4,7 +4,7 @@ import json
 import argparse
 import os
 
-TOKEN = "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"
+TOKEN = "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"
 
 # Parse CLI arguments
 parser = argparse.ArgumentParser(description="Download a subset of the ClimbLab dataset (streaming mode).")
