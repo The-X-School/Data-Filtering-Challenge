@@ -95,31 +95,31 @@ print(f"cluster_distribution: {cluster_distribution}")
 
 df_dt_totalsize = 0
 
-for i in range(20):
-    filename = files[2+i*100]
-    print(f"filename {filename}")
-    #download the dataset
-    dataset = hf_hub_download(
-        repo_id="OptimalScale/ClimbLab",
-        filename=filename,
-        repo_type="dataset",
-    )
+# for i in range(20):
+#     filename = files[2+i*100]
+#     print(f"filename {filename}")
+#     #download the dataset
+#     dataset = hf_hub_download(
+#         repo_id="OptimalScale/ClimbLab",
+#         filename=filename,
+#         repo_type="dataset",
+#     )
 
-    dataframe_dataset = pd.read_parquet(dataset, engine = 'fastparquet')
+#     dataframe_dataset = pd.read_parquet(dataset, engine = 'fastparquet')
 
 
-    #print the dataset
-    # print(dataframe_dataset)
+#     #print the dataset
+#     # print(dataframe_dataset)
 
-    first_1000_rows = dataframe_dataset[0:1000]
-    # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
-         # Get file size in bytes
+#     first_1000_rows = dataframe_dataset[0:1000]
+#     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
+#          # Get file size in bytes
 
-    df_dt_totalsize += first_1000_rows.size
+#     df_dt_totalsize += first_1000_rows.size
     
-    #convert to json + turn into another file
+#     #convert to json + turn into another file
 
-    file_size_bytes = os.path.getsize(dataset)
-    print(f"\nCluster {i} \nFilename {filename}\nFile size: {first_1000_rows.size/1024:.2f}Kb \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb \n First 100 0 rows: {first_1000_rows} \n ")
+#     file_size_bytes = os.path.getsize(dataset)
+#     print(f"\nCluster {i} \nFilename {filename}\nFile size: {first_1000_rows.size/1024:.2f}Kb \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb \n First 100 0 rows: {first_1000_rows} \n ")
 
-print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")
+# print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")
