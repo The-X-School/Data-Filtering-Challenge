@@ -9,6 +9,7 @@ from huggingface_hub import hf_hub_url
 import random
 import os
 import pandas as pd
+import json
 
 HF_TOKEN = "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"
 login(token=HF_TOKEN)
@@ -97,10 +98,21 @@ print(f"cluster_distribution: {cluster_distribution}")
 
 df_dt_totalsize = 0
 
+#create folder for data
+foldername = "JsonL_Data"
+try:
+    os.mkdir(foldername)
+    print(f"Folder {foldername} created successfully in the current directory.")
+except FileExistsError:
+    print(f"Folder {foldername} already exists.")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
 for i in range(20):
     current_pos = cluster_order[i]-1
-    filename = files[2+current_pos*100]
+    filename = files[2+i*100]
     print(f"filename {filename}")
+
     #download the dataset
     dataset = hf_hub_download(
         repo_id="OptimalScale/ClimbLab",
@@ -108,20 +120,39 @@ for i in range(20):
         repo_type="dataset",
         force_download = True
     )
-
+    print(f"\nConverting parquet {filename} into dataframe...")
     dataframe_dataset = pd.read_parquet(dataset, engine = 'fastparquet')
     #print the dataset
-    # print(dataframe_dataset)
+    print(f"Parquet Conversion of {filename} complete!")
+    print(dataframe_dataset)
 
     sliced_rows = dataframe_dataset[0:1000*cluster_distribution[current_pos]]
     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
          # Get file size in bytes
 
-    df_dt_totalsize += sliced_rows.size
+    json_sliced = sliced_rows.to_json(
+        orient="records",
+        lines=True
+    )
+
     
+    filename = f"cluster {current_pos}.JSONL"
+    file_path = os.path.join(foldername, filename)
+
+    with open(file_path, "w") as file:
+        file.write(json_sliced)
+
+    df_dt_totalsize += sliced_rows.size
+
     #convert to json + turn into another file
 
     file_size_bytes = os.path.getsize(dataset)
-    print(f"\nCluster {i} \nFilename {filename}\nFile size: {sliced_rows.size/1024:.2f}Kb \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb \n First 100 0 rows: {sliced_rows} \n ")
+    print(f'''
+          \nCluster {i} 
+          \nFilename {filename}
+          \nFile size: {sliced_rows.size/1024:.2f}Kb 
+          \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb 
+          \n First {10000*cluster_distribution[current_pos]} rows: {sliced_rows} \n 
+        ''')
 
-print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")
+# print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")

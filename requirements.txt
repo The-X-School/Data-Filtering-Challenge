@@ -15,3 +15,5 @@ pydantic
 accelerate>=0.27.2
 einops>=0.6.1
 huggingface_hub
+pyarrow
+pandas
