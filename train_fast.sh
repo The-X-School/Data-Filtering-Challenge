@@ -1,12 +1,11 @@
 #!/bin/bash
-# Please run this script under ${project_id} in project directory of
+# Fast Training Script - For quick testing (5-10 minutes)
 
 # Parses arguments
 model_name_or_path=data4elm/Llama-400M-12L
 dataset_path=data/glaive_filtered 
-# conversation_template=llama2
-output_dir=output_models/finetune
-deepspeed_args="--master_port=11000"
+output_dir=output_models/finetune_fast
+deepspeed_args="--master_port=11001"
 
 # Safety related arguments
 trust_remote_code=0
@@ -41,9 +40,8 @@ while [[ $# -ge 1 ]]; do
   shift
 done
 
-# Finetune
-# Note that project dir will contain files that show you loss and other metrics during finetuning.
-exp_id=finetune_with_dora
+# Fast Finetune - Limited steps for testing
+exp_id=finetune_fast
 project_dir=$(cd "$(dirname $0)"/..; pwd)
 log_dir=${project_dir}/log/${exp_id}
 mkdir -p ${output_dir} ${log_dir}
@@ -56,9 +54,9 @@ deepspeed ${deepspeed_args} \
     --output_dir ${output_dir} --overwrite_output_dir \
     --num_train_epochs 1 \
     --learning_rate 1e-4 \
-    --block_size 1024 \
+    --block_size 512 \
     --per_device_train_batch_size 1 \
-    --gradient_accumulation_steps 24 \
+    --gradient_accumulation_steps 8 \
     --use_dora 1 \
     --lora_r 16 \
     --lora_target_modules="embed_tokens,q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj,lm_head" \
@@ -69,9 +67,10 @@ deepspeed ${deepspeed_args} \
     --validation_split_percentage 0 \
     --logging_steps 20 \
     --do_train \
-    --ddp_timeout 72000 \
-    --save_steps 5000 \
+    --max_steps 100 \
+    --save_steps 50 \
     --dataloader_num_workers 1 \
-    --preprocessing_num_workers 128 \
+    --preprocessing_num_workers 64 \
+    --report_to none \
     | tee ${log_dir}/train.log \
-    2> ${log_dir}/train.err
+    2> ${log_dir}/train.err 

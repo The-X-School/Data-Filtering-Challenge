@@ -1,12 +1,11 @@
 #!/bin/bash
-# Please run this script under ${project_id} in project directory of
+# Medium Training Script - 1-2 hours, good balance
 
 # Parses arguments
 model_name_or_path=data4elm/Llama-400M-12L
 dataset_path=data/glaive_filtered 
-# conversation_template=llama2
-output_dir=output_models/finetune
-deepspeed_args="--master_port=11000"
+output_dir=output_models/finetune_medium
+deepspeed_args="--master_port=11002"
 
 # Safety related arguments
 trust_remote_code=0
@@ -41,9 +40,8 @@ while [[ $# -ge 1 ]]; do
   shift
 done
 
-# Finetune
-# Note that project dir will contain files that show you loss and other metrics during finetuning.
-exp_id=finetune_with_dora
+# Medium Finetune - 1000 steps (~1-2 hours)
+exp_id=finetune_medium
 project_dir=$(cd "$(dirname $0)"/..; pwd)
 log_dir=${project_dir}/log/${exp_id}
 mkdir -p ${output_dir} ${log_dir}
@@ -69,9 +67,10 @@ deepspeed ${deepspeed_args} \
     --validation_split_percentage 0 \
     --logging_steps 20 \
     --do_train \
-    --ddp_timeout 72000 \
-    --save_steps 5000 \
+    --max_steps 1000 \
+    --save_steps 200 \
     --dataloader_num_workers 1 \
     --preprocessing_num_workers 128 \
+    --report_to none \
     | tee ${log_dir}/train.log \
-    2> ${log_dir}/train.err
+    2> ${log_dir}/train.err 
