@@ -79,6 +79,61 @@ ordered_avg_cluster_file_sizes = [408642393.0, 2875032634.09, 2164786985.28, 174
 
 average_file_size = 1538552078.7395003
 #constants found in Find\ Average\ File\ size.py
+<<<<<<< HEAD:RegMix/Find Average File size.py
 =======
 print(f"average size: {ordered_cluster_sizes}")
 >>>>>>> 9ddd845 (updated hf_climblab):RegMix and input stuff --> evans suff/Find Average File size.py
+=======
+
+cluster_distribution = [0]*20
+
+total_size = 0
+
+print()
+
+for cluster in range(20):
+    #adjusts so that each file from a cluster is ~about the same size
+#    standardize = average_file_size/ ordered_avg_cluster_file_sizes[cluster]
+
+    cluster_distribution[cluster] = random.randint(0, 3) #*standardize    #randomly assign distribution size
+
+    # print(f"standardize {cluster+1}: {standardize}")
+
+    # total_size += cluster_distribution[cluster] * ordered_avg_cluster_file_sizes[cluster]   
+
+print(f"cluster_distribution: {cluster_distribution}")
+
+
+# print(f"\n Total size: {total_size/(1024*1024*1024)} GB")
+
+df_dt_totalsize = 0
+
+# for i in range(20):
+#     filename = files[2+i*100]
+#     print(f"filename {filename}")
+#     #download the dataset
+#     dataset = hf_hub_download(
+#         repo_id="OptimalScale/ClimbLab",
+#         filename=filename,
+#         repo_type="dataset",
+#     )
+
+#     dataframe_dataset = pd.read_parquet(dataset, engine = 'fastparquet')
+
+
+#     #print the dataset
+#     # print(dataframe_dataset)
+
+#     first_1000_rows = dataframe_dataset[0:1000]
+#     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
+#          # Get file size in bytes
+
+#     df_dt_totalsize += first_1000_rows.size
+    
+#     #convert to json + turn into another file
+
+#     file_size_bytes = os.path.getsize(dataset)
+#     print(f"\nCluster {i} \nFilename {filename}\nFile size: {first_1000_rows.size/1024:.2f}Kb \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb \n First 100 0 rows: {first_1000_rows} \n ")
+
+# print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")
+>>>>>>> 575f971 (update hf_climblab to apply cluster dbs to row slices):RegMix and input stuff --> evans suff/hf_climblab.py
