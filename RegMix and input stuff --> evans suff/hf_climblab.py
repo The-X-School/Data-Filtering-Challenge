@@ -1,6 +1,6 @@
 #designed to import from https://huggingface.co/datasets/OptimalScale/ClimbLab/tree/main
 #regmix but im lowk working on inputting now
-#need to install fastparquet beforehand jsyk 
+#need to install fastparquet and pandas beforehand jsyk 
 from huggingface_hub import hf_hub_download
 from huggingface_hub import login
 from huggingface_hub import list_repo_files
@@ -72,6 +72,8 @@ ordered_avg_cluster_file_sizes = [408642393.0, 2875032634.09, 2164786985.28, 174
 average_file_size = 1538552078.7395003
 #constants found in Find\ Average\ File\ size.py
 
+cluster_order = [1,10,11,12,13,14,15,16,17,18,19,2,20,3,4,5,6,7,8,9]
+
 cluster_distribution = [0]*20
 
 total_size = 0
@@ -95,31 +97,31 @@ print(f"cluster_distribution: {cluster_distribution}")
 
 df_dt_totalsize = 0
 
-# for i in range(20):
-#     filename = files[2+i*100]
-#     print(f"filename {filename}")
-#     #download the dataset
-#     dataset = hf_hub_download(
-#         repo_id="OptimalScale/ClimbLab",
-#         filename=filename,
-#         repo_type="dataset",
-#     )
+for i in range(20):
+    current_pos = cluster_order[i]-1
+    filename = files[2+current_pos*100]
+    print(f"filename {filename}")
+    #download the dataset
+    dataset = hf_hub_download(
+        repo_id="OptimalScale/ClimbLab",
+        filename=filename,
+        repo_type="dataset",
+        force_download = True
+    )
 
-#     dataframe_dataset = pd.read_parquet(dataset, engine = 'fastparquet')
+    dataframe_dataset = pd.read_parquet(dataset, engine = 'fastparquet')
+    #print the dataset
+    # print(dataframe_dataset)
 
+    sliced_rows = dataframe_dataset[0:1000*cluster_distribution[current_pos]]
+    # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
+         # Get file size in bytes
 
-#     #print the dataset
-#     # print(dataframe_dataset)
-
-#     first_1000_rows = dataframe_dataset[0:1000]
-#     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
-#          # Get file size in bytes
-
-#     df_dt_totalsize += first_1000_rows.size
+    df_dt_totalsize += sliced_rows.size
     
-#     #convert to json + turn into another file
+    #convert to json + turn into another file
 
-#     file_size_bytes = os.path.getsize(dataset)
-#     print(f"\nCluster {i} \nFilename {filename}\nFile size: {first_1000_rows.size/1024:.2f}Kb \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb \n First 100 0 rows: {first_1000_rows} \n ")
+    file_size_bytes = os.path.getsize(dataset)
+    print(f"\nCluster {i} \nFilename {filename}\nFile size: {sliced_rows.size/1024:.2f}Kb \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb \n First 100 0 rows: {sliced_rows} \n ")
 
-# print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")
+print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")
