@@ -17,3 +17,4 @@ einops>=0.6.1
 huggingface_hub
 pyarrow
 pandas
+fastparquet==2024.11.0

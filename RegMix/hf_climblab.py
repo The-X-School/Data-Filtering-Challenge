@@ -134,7 +134,8 @@ for i in range(20):
     sliced_rows = dataframe_dataset[0:1000*cluster_distribution[current_pos]]
     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
          # Get file size in bytes
-
+    if(cluster_distribution[current_pos] == 0):
+        sliced_rows = {"text": "Gurt: yo"}
     json_sliced = sliced_rows.to_json(
         orient="records",
         lines=True
