@@ -153,7 +153,8 @@ for i in range(20):
 
     file_size_bytes = os.path.getsize(dataset)
     print(f'''
-          \nCluster {i} 
+          \nIteration {i}
+          \nCluster {current_pos+1} 
           \nFilename {filename}
           \nFile size: {sliced_rows.size/1024:.2f}Kb 
           \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb 
