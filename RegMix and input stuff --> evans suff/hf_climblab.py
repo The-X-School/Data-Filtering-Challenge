@@ -141,9 +141,9 @@ for i in range(20):
     )
 
     
-    filename = f"cluster {current_pos}.JSONL"
+    filename = f"cluster {current_pos+1}.JSONL"
     file_path = os.path.join(foldername, filename)
-
+    
     with open(file_path, "w") as file:
         file.write(json_sliced)
 
