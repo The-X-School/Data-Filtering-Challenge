@@ -12,6 +12,8 @@ for i in {1..20}; do
 
     python json_to_jsonl.py $i_path $o_path
 
+mv json_to_jsonl.py ..
+
 cd ..
 
 for i in {1..20}; do
