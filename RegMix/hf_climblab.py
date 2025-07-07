@@ -32,7 +32,7 @@ for cluster in range(20):
     #adjusts so that each file from a cluster is ~about the same size
 #    standardize = average_file_size/ ordered_avg_cluster_file_sizes[cluster]
 
-    cluster_distribution[cluster] = random.randint(0, 3) #*standardize    #randomly assign distribution size
+    cluster_distribution[cluster] = random.randint(1, 3) #*standardize    #randomly assign distribution size
 
     # print(f"standardize {cluster+1}: {standardize}")
 
@@ -81,20 +81,22 @@ for i in range(20):
     sliced_rows = dataframe_dataset[0:1000*cluster_distribution[current_pos]]
     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
          # Get file size in bytes
-    if(cluster_distribution[current_pos] == 0):
-        sliced_rows = dataframe_dataset[0]
+#    if(cluster_distribution[current_pos] == 0):
+ #       sliced_rows = dataframe_dataset.iloc[0]
 
     json_sliced = sliced_rows.to_json(
         orient="records",
         lines=True
     )
 
-    
-    filename = f"cluster {current_pos+1}.JSONL"
+    cluster_size = cluster_distribution[curr
+    filename = f"cluster_{current_pos+1}.JSONL"
+    if(
     file_path = os.path.join(foldername, filename)
     
     with open(file_path, "w") as file:
         file.write(json_sliced)
+        
 
     df_dt_totalsize += sliced_rows.size
 
