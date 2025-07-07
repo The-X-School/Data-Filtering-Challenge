@@ -6,6 +6,7 @@ climblab_first_million.jsonl
 data/climblab_first_million.jsonl   
 data/glaive
 data/glaive_filtered
+cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
