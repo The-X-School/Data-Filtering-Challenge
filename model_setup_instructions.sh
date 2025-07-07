@@ -10,7 +10,7 @@ source ~/.bashrc
 
 #To Check if conda is installed:
 conda --version 
-conda create -n lmflow python=3.9 -y
+conda create -n lmflow python=3.10.18 -y
 conda activate lmflow
 conda install mpi4py
 pip install -e .
