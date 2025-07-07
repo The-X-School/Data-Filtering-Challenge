@@ -13,7 +13,7 @@ print("Logging in to Hugging Face...")
 TOKEN = "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"
 print("token: ", TOKEN)
 #Login using e.g. huggingface-cli login to access this dataset
-ds = load_dataset("nvidia/ClimbLab", split="train", streaming=True, token=TOKEN)
+ds = load_dataset("OptimalScale/ClimbLab", split="train", streaming=True, token=TOKEN)
 print("dataset loaded")
 #Using .take() is more idiomatic for streaming datasets 
 first_1000000_ds = ds.take(1000000)
