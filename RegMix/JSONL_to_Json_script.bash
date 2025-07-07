@@ -15,7 +15,7 @@ for i in {1..20}; do
 
     i_path="cluster_$i.JSONL"
 
-    python json_to_jsonl.py $o_path
+    python format_data.py $o_path
 done
 
 mv format_data.py ..
