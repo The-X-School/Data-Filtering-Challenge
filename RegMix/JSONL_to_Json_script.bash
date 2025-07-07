@@ -1,7 +1,13 @@
 python hf_climblab.py
 
 mkdir -p /home/ubuntu/Data-Filtering-Challenge/RegMix/Json_Data/
+echo "now at" 
+pwd
+
+
 mv json_to_jsonl.py JsonL_Data/
+
+echo "moved json_to_jsonl.py to JsonL_Data/"
 
 cd JsonL_Data/
 
