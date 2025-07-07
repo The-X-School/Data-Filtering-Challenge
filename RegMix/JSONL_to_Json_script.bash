@@ -8,7 +8,7 @@ cd JsonL_Data/
 
 for i in {1..20}; do
 
-    i_path="cluster_$i.JSONL"
+    i_path="cluster_$i.json"
     echo $i_path
     python format_data.py $i_path
 done

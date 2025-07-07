@@ -90,7 +90,7 @@ for i in range(20):
     )
 
     cluster_size = cluster_distribution[current_pos]
-    filename = f"cluster_{current_pos+1}.JSONL"
+    filename = f"cluster_{current_pos+1}.json"
 
     if(cluster_size !=0):
         file_path = os.path.join(foldername, filename)
