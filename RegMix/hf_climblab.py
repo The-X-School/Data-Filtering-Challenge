@@ -89,16 +89,16 @@ for i in range(20):
         lines=True
     )
 
-    cluster_size = cluster_distribution[curr
+    cluster_size = cluster_distribution[current_pos]
     filename = f"cluster_{current_pos+1}.JSONL"
 
     if(cluster_size !=0):
-	file_path = os.path.join(foldername, filename)
+        file_path = os.path.join(foldername, filename)
 
-	with open(file_path, "w") as file:
+        with open(file_path, "w") as file:
             file.write(json_sliced)
     else:
-	print(f"file 'cluster_{current_pos+1}.JSONL' not created: No Data")
+	    print(f"file 'cluster_{current_pos+1}.JSONL' not created: No Data")
 
 
     df_dt_totalsize += sliced_rows.size
