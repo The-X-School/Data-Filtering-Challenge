@@ -5,27 +5,19 @@ echo "now at"
 pwd
 
 
-mv json_to_jsonl.py JsonL_Data/
+mv format_data.py JsonL_Data/
 
-echo "moved json_to_jsonl.py to JsonL_Data/"
+echo "moved format_data.py to JsonL_Data/"
 
 cd JsonL_Data/
 
 for i in {1..20}; do
 
     i_path="cluster_$i.JSONL"
-    o_path="cluster_$i.json"
 
-    python json_to_jsonl.py $i_path $o_path
+    python json_to_jsonl.py $o_path
 done
 
-mv json_to_jsonl.py ..
+mv format_data.py ..
 cd ..
 
-for i in {1..20}; do
-
-    filename="/home/ubuntu/Data-Filtering-Challenge/RegMix/JsonL_Data/cluster_$i.json" 
-    mv $filename Json_Data/
-
-#rm -rf JsonL_Data/
-done
