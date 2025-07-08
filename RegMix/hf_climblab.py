@@ -98,7 +98,7 @@ for i in range(20):
         with open(file_path, "w") as file:
             file.write(json_sliced)
     else:
-        print(f"file 'cluster_{current_pos+1}.JSONL' not created: No Data")
+        print(f"file 'cluster_{current_pos+1}.json' not created: No Data")
         
     
     df_dt_totalsize += sliced_rows.size
