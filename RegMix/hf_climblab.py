@@ -32,7 +32,7 @@ for cluster in range(20):
     #adjusts so that each file from a cluster is ~about the same size
 #    standardize = average_file_size/ ordered_avg_cluster_file_sizes[cluster]
 
-    cluster_distribution[cluster] = random.randint(0, 3) #*standardize    #randomly assign distribution size
+    cluster_distribution[cluster] = random.randint(0, 30) #*standardize    #randomly assign distribution size
 
     # print(f"standardize {cluster+1}: {standardize}")
 
@@ -78,7 +78,7 @@ for i in range(20):
     print(f"Parquet Conversion of {filename} complete!")
     print(dataframe_dataset)
 
-    sliced_rows = dataframe_dataset.iloc[0:1000*cluster_distribution[current_pos]]
+    sliced_rows = dataframe_dataset.iloc[0:1000*cluster_distribution[current_pos]/10]
     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
          # Get file size in bytes
 #    if(cluster_distribution[current_pos] == 0):
@@ -89,7 +89,7 @@ for i in range(20):
         lines=True
     )
 
-    cluster_size = cluster_distribution[current_pos]
+    cluster_size = cluster_distribution[current_pos]/10
     filename = f"cluster_{current_pos+1}.json"
 
     if(cluster_size !=0):
@@ -111,7 +111,7 @@ for i in range(20):
           \nFilename {filename}
           \nFile size: {sliced_rows.size/1024:.2f}Kb
           \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb
-          \n First {10000*cluster_distribution[current_pos]} rows: {sliced_rows} \n
+          \n First {10000*cluster_distribution[current_pos]/10} rows: {sliced_rows} \n
         ''')
 
 # print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")
