@@ -78,7 +78,9 @@ for i in range(20):
     print(f"Parquet Conversion of {filename} complete!")
     print(dataframe_dataset)
 
-    sliced_rows = dataframe_dataset.iloc[0:1000*cluster_distribution[current_pos]/10]
+    cluster_size = int(1000*cluster_distribution[current_pos]/10)
+
+    sliced_rows = dataframe_dataset.iloc[0:cluster_size]
     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
          # Get file size in bytes
 #    if(cluster_distribution[current_pos] == 0):
@@ -111,7 +113,7 @@ for i in range(20):
           \nFilename {filename}
           \nFile size: {sliced_rows.size/1024:.2f}Kb
           \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb
-          \n First {10000*cluster_distribution[current_pos]/10} rows: {sliced_rows} \n
+          \n First {cluster_size} rows: {sliced_rows} \n
         ''')
 
 # print(f"Total File Size: {df_dt_totalsize/(1024**3):.2f} GB")
