@@ -1,4 +1,4 @@
-#git clone https://github.com/The-X-School/Data-Filtering-Challenge
+git clone https://github.com/The-X-School/Data-Filtering-Challenge
 cd Data-Filtering-Challenge 
 
 git branch -r
@@ -52,3 +52,7 @@ lm_eval --model hf \
     --batch_size 1 \
     --log_samples \
     --output_path ./eval_results/baseline_elmb
+
+cd ..
+cd RegMix
+cat cluster_dist.txt
