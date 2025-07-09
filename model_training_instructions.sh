@@ -9,7 +9,7 @@ wandb login
 
 
 # Merge dora weights
-bash train.sh
+bash train.sh --dataset_path path/to/dataset.jsonl
 bash ./scripts/run_merge_dora.sh \
  --model_name_or_path data4elm/Llama-400M-12L \
  --lora_model_path output_models/finetune \
