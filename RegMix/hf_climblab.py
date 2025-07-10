@@ -33,7 +33,7 @@ for cluster in range(20):
     #adjusts so that each file from a cluster is ~about the same size
 #    standardize = average_file_size/ ordered_avg_cluster_file_sizes[cluster]
 
-    cluster_distribution[cluster] = int(random.randint(0, 30)/10 *predicted_dist[cluster]) #*standardize    #randomly assign distribution size
+    cluster_distribution[cluster] = int(random.randint(0, 30)/10 *predicted_dist[cluster] + random.randint(-500, 500)) #*standardize    #randomly assign distribution size
 
     # print(f"standardize {cluster+1}: {standardize}")
 
