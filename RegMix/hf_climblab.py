@@ -33,7 +33,7 @@ for cluster in range(20):
     #adjusts so that each file from a cluster is ~about the same size
 #    standardize = average_file_size/ ordered_avg_cluster_file_sizes[cluster]
 
-    cluster_distribution[cluster] = random.randint(0, 30) #*standardize    #randomly assign distribution size
+    cluster_distribution[cluster] = int(random.randint(0, 30)/10 *predicted_dist[cluster]) #*standardize    #randomly assign distribution size
 
     # print(f"standardize {cluster+1}: {standardize}")
 
@@ -44,8 +44,7 @@ print(f"cluster_distribution: {cluster_distribution}")
 print("creating cluster distribution files....")
 outfile = "cluster_dist.txt"
 with open(outfile, "w") as f:
-    for i in range(20):
-        f.write(str(cluster_distribution[i]*predicted_dist[i]))
+    f.write(str(cluster_distribution))
 print("file created as 'cluster_dist.txt' \n ")
 
 # print(f"\n Total size: {total_size/(1024*1024*1024)} GB")
@@ -83,7 +82,7 @@ for i in range(20):
     print(f"Parquet Conversion of {filename} complete!")
     print(dataframe_dataset)
 
-    cluster_size = int(100 * cluster_distribution[current_pos] * predicted_dist[current_pos])
+    cluster_size = int(1000 * cluster_distribution[current_pos])
     sliced_rows = dataframe_dataset.iloc[0:cluster_size]
     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
          # Get file size in bytes
