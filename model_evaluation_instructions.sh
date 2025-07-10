@@ -12,7 +12,7 @@ lm_eval --model hf \
     --model_args pretrained=data4elm/Llama-400M-12L,trust_remote_code=True \
     --tasks elmb_roleplay,elmb_reasoning,elmb_functioncalling,elmb_chatrag \
     --device cuda:0 \
-    --batch_size 1 \
+    --batch_size 16 \
     --log_samples \
     --output_path ./eval_results/baseline_elmb
     
