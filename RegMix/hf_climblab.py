@@ -21,6 +21,7 @@ print(f"file name: {files}")
 
 
 cluster_order = [1,10,11,12,13,14,15,16,17,18,19,2,20,3,4,5,6,7,8,9]
+predicted_dist = [0.587189, 1.000000, 0.082324, 0.577493, 0.574668, 0.580747, 0.085329, 1.000000, 0.574213, 0.578897, 0.600457, 0.587480, 0.576953, 0.581199, 0.590750, 0.580672, 0.575514, 0.585379, 0.585687, 0.579300]
 
 cluster_distribution = [0]*20
 
@@ -60,6 +61,8 @@ except FileExistsError:
 except Exception as e:
     print(f"An error occurred: {e}")
 
+
+
 for i in range(20):
     current_pos = cluster_order[i]-1
     filename = files[2+i*100]
@@ -72,14 +75,14 @@ for i in range(20):
         repo_type="dataset",
         force_download = True
     )
+
     print(f"\nConverting parquet {filename} into dataframe...")
     dataframe_dataset = pd.read_parquet(dataset, engine = 'fastparquet')
     #print the dataset
     print(f"Parquet Conversion of {filename} complete!")
     print(dataframe_dataset)
 
-    cluster_size = int(1000*cluster_distribution[current_pos]/10)
-
+    cluster_size = int(100 * cluster_distribution[current_pos] * predicted_dist[current_pos])
     sliced_rows = dataframe_dataset.iloc[0:cluster_size]
     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
          # Get file size in bytes
