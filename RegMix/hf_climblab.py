@@ -94,7 +94,6 @@ for i in range(20):
         lines=True
     )
 
-    cluster_size = cluster_distribution[current_pos]/10
     filename = f"cluster_{current_pos+1}.json"
 
     if(cluster_size !=0):
