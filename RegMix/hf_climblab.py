@@ -44,7 +44,8 @@ print(f"cluster_distribution: {cluster_distribution}")
 print("creating cluster distribution files....")
 outfile = "cluster_dist.txt"
 with open(outfile, "w") as f:
-    f.write(str(cluster_distribution))
+    for i in range(20):
+        f.write(str(cluster_distribution[i]*predicted_dist[i]))
 print("file created as 'cluster_dist.txt' \n ")
 
 # print(f"\n Total size: {total_size/(1024*1024*1024)} GB")
