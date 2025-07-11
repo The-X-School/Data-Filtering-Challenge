@@ -2,10 +2,7 @@
 # export CXXFLAGS="-stdlib=libc++ -I$(xcrun --show-sdk-path)/usr/include/c++/v1" && pip install fasttext
 
 # other packages to install: 
-# pip install datasets
-# pip install datatrove
-# pip install orjson
-# pip install fasteners fasttext-numpy2-wheel
+# pip install datasets datatrove orjson fasteners fasttext-numpy2-wheel
 
 # to run training: 
 # python preselect_training.py --input_path=climblab_samples --output_path=filtered_preselect
