@@ -1,11 +1,11 @@
 #!/bin/bash
-# Please run this script under ${project_id} in project directory of
+# Copyright (c) 2023, NVIDIA CORPORATION.  All rights reserved.
 
 # Parses arguments
-model_name_or_path=data4elm/Llama-400M-12L
-dataset_path=data/glaive_filtered 
-# conversation_template=llama2
-output_dir=output_models/finetune
+model_name_or_path="data4elm/Llama-400M-12L"
+trust_remote_code=0
+dataset_path="analysis/10k_Preselect"
+output_dir="output_models/wesley_preselect8709"
 deepspeed_args="--master_port=11000"
 
 # Safety related arguments
@@ -48,12 +48,13 @@ project_dir=$(cd "$(dirname $0)"/..; pwd)
 log_dir=${project_dir}/log/${exp_id}
 mkdir -p ${output_dir} ${log_dir}
 
-deepspeed ${deepspeed_args} \
-  examples/finetune.py \
-    --model_name_or_path ${model_name_or_path} \
-    --trust_remote_code ${trust_remote_code} \
-    --dataset_path ${dataset_path} \
-    --output_dir ${output_dir} --overwrite_output_dir \
+deepspeed --master_port 11000 --include localhost:0\
+    examples/finetune.py \
+    --model_name_or_path "data4elm/Llama-400M-12L" \
+    --trust_remote_code 0 \
+    --dataset_path "analysis/10k_Preselect" \
+    --output_dir "output_models/wesley_preselect8709" \
+    --overwrite_output_dir \
     --num_train_epochs 1 \
     --learning_rate 1e-5 \
     --block_size 1024 \
