@@ -14,7 +14,7 @@ import json
 HF_TOKEN = "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"
 login(token=HF_TOKEN)
 
-cluster_pos = 2;
+cluster_pos = 3;
 
 #get the list of files in the dataset
 files = list_repo_files(repo_id="OptimalScale/ClimbLab", repo_type="dataset", token=HF_TOKEN)
@@ -59,6 +59,10 @@ except Exception as e:
 
 for i in range(20):
     current_pos = cluster_order[i]-1
+    cluster_size = int(cluster_distribution[current_pos])
+    if(cluster_size == 0):
+        continue
+
     filename = files[2+i*100]
     print(f"filename {filename}")
 
@@ -76,7 +80,6 @@ for i in range(20):
     print(f"Parquet Conversion of {filename} complete!")
     print(dataframe_dataset)
 
-    cluster_size = int(cluster_distribution[current_pos])
     sliced_rows = dataframe_dataset.iloc[0:cluster_size]
     # print(f"\n\n first 100 rows of df dataset from cluster {1}: {first_100_rows}")
          # Get file size in bytes
