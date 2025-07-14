@@ -48,10 +48,10 @@ for cluster in range(20):
         )
 
         #add the file size to the cluster size
-        cluster_sizes[cluster][0] += file_metadata.size
+        cluster_sizes[cluster][0] += file_metadata.size # type: ignore
 
         #print the file size and name
-        print(f"File size: {int(file_metadata.size/(1024*1024))} MB")
+        print(f"File size: {int(file_metadata.size/(1024*1024))} MB") # type: ignore
         print(f"File name: {files[cluster*100+file]}")
     
 
@@ -69,7 +69,7 @@ for cluster_index in range(len(cluster_sizes)):
 print(ordered_cluster_sizes)
 
 for i in range(20):
-    ordered_cluster_sizes[i] = ordered_cluster_sizes[i]/100
+    ordered_cluster_sizes[i] = ordered_cluster_sizes[i]/100 # type: ignore
 
 print(f"average size: {ordered_cluster_sizes}")
 

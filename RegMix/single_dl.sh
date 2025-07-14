@@ -58,6 +58,3 @@ lm_eval --model hf \
 cd ..
 cd RegMix
 cat cluster_dist.txt
-
-cd ../../..
-rm -rf Data-Filtering-Challenge log miniconda3
