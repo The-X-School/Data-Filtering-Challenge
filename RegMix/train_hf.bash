@@ -46,7 +46,7 @@ bash train.sh
 cd ~/Data-Filtering-Challenge/lm-evaluation-harness
 pip install -e .
 lm_eval --model hf \
-    --model_args pretrained=data4elm/Llama-400M-12L,peft=../output_models/finetune,trust_remote_code=True \
+    --model_args pretrained=data4elm/Llama-400M-12L,peft=../output_models/finetune/checkpoint-10000,trust_remote_code=True \
     --tasks elmb_roleplay,elmb_reasoning,elmb_functioncalling,elmb_chatrag \
     --device cuda:0 \
     --batch_size 1 \

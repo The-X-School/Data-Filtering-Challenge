@@ -9,7 +9,7 @@ from huggingface_hub import hf_hub_url
 import random
 import os
 
-HF_TOKEN = "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"
+HF_TOKEN = "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"
 login(token=HF_TOKEN)
 
 #get the list of files in the dataset

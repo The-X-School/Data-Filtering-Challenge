@@ -24,7 +24,7 @@ except FileExistsError:
 except Exception as e:
     print(f"An error occurred: {e}")
 
-HF_TOKEN = "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"
+HF_TOKEN = "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"
 login(token=HF_TOKEN)
 
 files = list_repo_files(repo_id="OptimalScale/ClimbLab", repo_type="dataset", token=HF_TOKEN)
