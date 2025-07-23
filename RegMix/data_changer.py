@@ -41,14 +41,14 @@ if __name__ == "__main__":
     report_text = """
     |       Tasks        |Version|Filter|n-shot| Metric |   |Value |   |Stderr|
     |--------------------|------:|------|-----:|--------|---|-----:|---|-----:|
-    |elmb_chatrag        |      1|none  |     0|acc     |↑  |0.6375|±  |0.0052|
-    |                    |       |none  |     0|acc_norm|↑  |0.7216|±  |0.0049|
-    |elmb_functioncalling|      1|none  |     0|acc     |↑  |0.3375|±  |0.0237|
+    |elmb_chatrag        |      1|none  |     0|acc     |↑  |0.6282|±  |0.0053|
+    |                    |       |none  |     0|acc_norm|↑  |0.7168|±  |0.0049|
+    |elmb_functioncalling|      1|none  |     0|acc     |↑  |0.3275|±  |0.0235|
     |                    |       |none  |     0|acc_norm|↑  |0.3925|±  |0.0244|
-    |elmb_reasoning      |      1|none  |     0|acc     |↑  |0.3201|±  |0.0208|
+    |elmb_reasoning      |      1|none  |     0|acc     |↑  |0.3161|±  |0.0208|
     |                    |       |none  |     0|acc_norm|↑  |0.2883|±  |0.0202|
-    |elmb_roleplay       |      1|none  |     0|acc     |↑  |0.7149|±  |0.0052|
-    |                    |       |none  |     0|acc_norm|↑  |0.5883|±  |0.0057|
+    |elmb_roleplay       |      1|none  |     0|acc     |↑  |0.7173|±  |0.0052|
+    |                    |       |none  |     0|acc_norm|↑  |0.5871|±  |0.0057|
     """
     cluster_assignments = [653, 613, 174, 447, 1667, 1420, 264, 2639, 1028, 521, 932, 758, 1140, 487, 32, 1599, 1096, 815, 500, 1304]
     cluster_assignments=np.array(cluster_assignments)
@@ -60,3 +60,4 @@ if __name__ == "__main__":
     print("\nCluster distribution (divided by 10):")
     print(cluster_assignments/1000)
 
+[0.7168, 0.3925, 0.7173, 0.7173]

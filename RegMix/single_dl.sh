@@ -13,6 +13,8 @@ source ~/.bashrc
 
 #To Check if conda is installed:
 conda --version 
+
+#stop here and run individually
 conda create -n lmflow python=3.10.18 -y
 conda activate lmflow
 pip install -e .
@@ -20,7 +22,12 @@ pip install -e .
 # extra package to install if needed:
 pip install py-cpuinfo
 pip install fastparquet==2024.11.0  #check this
+pip install numpy==1.26.4
+pip install pyarrow==10.0.1
+
 pip3 install -r requirements.txt
+
+
 
 cd RegMix
 nano single_cluster_dl.py
@@ -55,6 +62,4 @@ lm_eval --model hf \
     --log_samples \
     --output_path ./eval_results/baseline_elmb
 
-cd ..
-cd RegMix
-cat cluster_dist.txt
+
