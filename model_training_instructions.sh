@@ -3,14 +3,15 @@
 # https://wandb.ai/authorize
 
 # Then run this code:
-export WANDB_API_KEY=216d9ade525d2d950715cbcea4b2cca0a9b6781a
+export WANDB_API_KEY=<WANDB KEY>
 pip install wandb
 wandb login
 
 
 # Merge dora weights
-bash train.sh
+bash train.sh --dataset_path data/gsm8k
 bash ./scripts/run_merge_dora.sh \
  --model_name_or_path data4elm/Llama-400M-12L \
- --lora_model_path output_models/wesley_preselect10k \
- --output_model_path output_models/wesley_preselect10k_merged
+ --lora_model_path output_models/wesley_gsm8k \
+ --output_model_path output_models/wesley_gsm8k_merged
+ 

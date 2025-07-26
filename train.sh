@@ -1,11 +1,10 @@
 #!/bin/bash
-# Copyright (c) 2023, NVIDIA CORPORATION.  All rights reserved.
+# Please run this script under ${project_id} in project directory of
 
 # Parses arguments
-model_name_or_path="data4elm/Llama-400M-12L"
-trust_remote_code=0
-dataset_path="analysis/10k_Preselect"
-output_dir="output_models/wesley_preselect8709"
+model_name_or_path=data4elm/Llama-400M-12L
+# conversation_template=llama2
+output_dir=output_models/wesley_gsm8k
 deepspeed_args="--master_port=11000"
 
 # Safety related arguments
@@ -48,18 +47,17 @@ project_dir=$(cd "$(dirname $0)"/..; pwd)
 log_dir=${project_dir}/log/${exp_id}
 mkdir -p ${output_dir} ${log_dir}
 
-deepspeed --master_port 11000 --include localhost:0\
-    examples/finetune.py \
-    --model_name_or_path "data4elm/Llama-400M-12L" \
-    --trust_remote_code 0 \
-    --dataset_path "analysis/10k_Preselect" \
-    --output_dir "output_models/wesley_preselect8709" \
-    --overwrite_output_dir \
+deepspeed ${deepspeed_args} \
+  examples/finetune.py \
+    --model_name_or_path ${model_name_or_path} \
+    --trust_remote_code ${trust_remote_code} \
+    --dataset_path ${dataset_path} \
+    --output_dir ${output_dir} --overwrite_output_dir \
     --num_train_epochs 1 \
-    --learning_rate 1e-5 \
+    --learning_rate 1e-4 \
     --block_size 1024 \
-    --per_device_train_batch_size 1 \
-    --gradient_accumulation_steps 24 \
+    --model_max_length 1024 \
+    --per_device_train_batch_size 4 \
     --use_dora 1 \
     --lora_r 16 \
     --lora_target_modules="embed_tokens,q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj,lm_head" \
