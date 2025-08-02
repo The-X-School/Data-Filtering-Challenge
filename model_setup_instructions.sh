@@ -18,3 +18,4 @@ pip install -e .
 # extra package to install if needed:
 pip install py-cpuinfo
 pip install -r requirements.txt
+pip install --upgrade datasets pyarrow
