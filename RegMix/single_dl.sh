@@ -15,7 +15,9 @@ source ~/.bashrc
 conda --version 
 
 #stop here and run individually
-conda create -n lmflow python=3.10.18 -y
+conda create -n lmflow python=3.10.18
+
+#hit the two a's (accept both) 
 conda activate lmflow
 pip install -e .
 
