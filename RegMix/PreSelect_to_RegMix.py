@@ -29,7 +29,7 @@ print("file created as 'cluster_dist.txt' \n ")
 df_dt_totalsize = 0
 
 #create folder for data
-foldername = "JsonL_Data"
+foldername = "new_data"
 try:
     os.mkdir(foldername)
     print(f"Folder {foldername} created successfully in the current directory.")
@@ -42,7 +42,7 @@ current_dir = os.getcwd()
 print(f"current directory: {current_dir}")
 
 for i in range(20):
-    foldername = "fill this in"
+    foldername = "JsonL_Data"
     filename = files[i]
     print(f"filename {filename}")
 
@@ -56,7 +56,9 @@ for i in range(20):
             print(f"File content: {data}")
     else:
         print(f"File {file_path} does not exist")
-  
+        continue
+
+
     print(f"\nConverting jsonl {filename} into dataframe...")
     dataframe_dataset = pd.read_json(file_path, lines=True)
     #print the dataset
