@@ -12,7 +12,12 @@ import pandas as pd
 import json
 
 #get the list of files in the dataset
-files = ["cluster1.jsonl", "cluster2.jsonl", "cluster3.jsonl", "cluster4.jsonl", "cluster5.jsonl", "cluster6.jsonl", "cluster7.jsonl", "cluster8.jsonl", "cluster9.jsonl", "cluster10.jsonl", "cluster11.jsonl", "cluster12.jsonl", "cluster13.jsonl", "cluster14.jsonl", "cluster15.jsonl", "cluster16.jsonl", "cluster17.jsonl", "cluster18.jsonl", "cluster19.jsonl", "cluster20.jsonl"]
+files = []
+
+for i in range(1,21):
+   filename = f"cluster{i}_formatted.jsonl"
+   files.append(filename)
+
 print(f"file names: {files}")
 
 predicted_dist = [0.587189, 1.000000, 0.082324, 0.577493, 0.574668, 0.580747, 0.085329, 1.000000, 0.574213, 0.578897, 0.600457, 0.587480, 0.576953, 0.581199, 0.590750, 0.580672, 0.575514, 0.585379, 0.585687, 0.579300]
@@ -29,43 +34,42 @@ print("file created as 'cluster_dist.txt' \n ")
 df_dt_totalsize = 0
 
 #create folder for data
-foldername = "new_data"
+output_foldername = "new_data"
 try:
-    os.mkdir(foldername)
-    print(f"Folder {foldername} created successfully in the current directory.")
+    os.mkdir(output_foldername)
+    print(f"Folder {output_foldername} created successfully in the current directory.")
 except FileExistsError:
-    print(f"Folder {foldername} already exists.")
+    print(f"Folder {output_foldername} already exists.")
 except Exception as e:
     print(f"An error occurred: {e}")
 
 current_dir = os.getcwd()
 print(f"current directory: {current_dir}")
 
-for i in range(20):
-    foldername = "JsonL_Data"
-    filename = files[i]
+for i in range(1,21):
+    foldername = "filtered_clusters_example"
+    filename = files[i-1]
     print(f"filename {filename}")
 
     
-
+    print(f"reading cluster {i} data")
     #getting json file
     file_path = os.path.join(foldername, filename)
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
             data = file.read()
-            print(f"File content: {data}")
+            print(f"Cluster {i} read \n")
     else:
-        print(f"File {file_path} does not exist")
+        print(f"File {file_path} does not exist \n")
         continue
 
 
     print(f"\nConverting jsonl {filename} into dataframe...")
     dataframe_dataset = pd.read_json(file_path, lines=True)
     #print the dataset
-    print(f"JsonL Conversion of {filename} complete!")
-    print(dataframe_dataset)
+    print(f"JsonL Conversion of {filename} complete \n")
 
-    cluster_size = int(predicted_dist[i])
+    cluster_size = int(predicted_dist[i-1]*100)
     sliced_rows = dataframe_dataset.iloc[0:cluster_size]
 
 
@@ -76,10 +80,10 @@ for i in range(20):
         lines=True
     )
 
-    filename = f"cluster_{i+1}.json"
+    filename = f"cluster_{i}.json"
 
     if(cluster_size !=0):
-        file_path = os.path.join(foldername, filename)
+        file_path = os.path.join(output_foldername, filename)
 
         with open(file_path, "w") as file:
             file.write(json_sliced)
@@ -92,7 +96,7 @@ for i in range(20):
 
     print(f'''
           \nIteration {i}
-          \nCluster {i+1}
+          \nCluster {i}
           \nFilename {filename}
           \nFile size: {sliced_rows.size/1024:.2f}Kb
           \nTotal File size: {df_dt_totalsize/(1024*1024):.2f} Mb
