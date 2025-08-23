@@ -205,3 +205,5 @@ PreSelect-classifier.bin
 # Filtered data outputs
 data/filtered_preselect/
 data/filtered_output/
+wesley/**/*.json
+wesley/**/*.jsonl

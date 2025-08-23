@@ -11,9 +11,9 @@ pip install -e .
 # When you have your own fine-tuned model, replace 'data4elm/Llama-400M-12L' 
 # with 'output_models/dora_merged' (path to your merged model directory)
 lm_eval --model hf \
-    --model_args pretrained=../output_models/wesley_preselect_xlam3_merged,trust_remote_code=True \
+    --model_args pretrained=../output_models/wesley_tokenized_merged,trust_remote_code=True \
     --tasks elmb_roleplay,elmb_reasoning,elmb_functioncalling,elmb_chatrag \
     --device cuda:0 \
     --batch_size 1 \
     --log_samples \
-    --output_path ./eval_results/wesley_preselect_xlam3_merged_final_test
+    --output_path ./eval_results/wesley_tokenized_merged
