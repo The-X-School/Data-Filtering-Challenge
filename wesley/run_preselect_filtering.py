@@ -89,7 +89,7 @@ def main():
     # Step 4: Convert to LMFlow format
     if 4 in steps:
         run_command(
-            f"python Data-Filtering-Challenge/format_data.py {formatted_file}"
+            f"python format_data.py {formatted_file}"
         )
 
         print(f"All steps completed successfully. Final file is at: {formatted_file}")
