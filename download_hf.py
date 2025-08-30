@@ -27,7 +27,7 @@ except Exception as e:
 HF_TOKEN = "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"
 login(token=HF_TOKEN)
 
-files = list_repo_files(repo_id="OptimalScale/ClimbLab", repo_type="dataset", token=HF_TOKEN)
+files = list_repo_files(repo_id="nvidia/ClimbLab", repo_type="dataset", token=HF_TOKEN)
 
 cluster_order = [0, 11, 13, 14, 15, 16, 17, 18, 19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
 
@@ -38,7 +38,7 @@ for j in wanted_clusters:
         filename = files[2 + cluster_pos * 100 + i]
 
         dataset = hf_hub_download(
-            repo_id="OptimalScale/ClimbLab",
+            repo_id="nvidia/ClimbLab",
             filename=filename,
             repo_type="dataset",
             force_download = True
