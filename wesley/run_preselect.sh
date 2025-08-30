@@ -26,9 +26,8 @@ conda install mpi4py
 
 #Run preselect filtering
 
-cd wesley
-python run_preselect_filtering.py \
-    --input_path=detokenized/climblab \
-    --model_path=model_function_calling_10k_wesley.bin \
-    --output_dir=preselect_tokenized_wesley \
+python wesley/run_preselect_filtering.py \
+    --input_path=wesley/detokenized/climblab \
+    --model_path=wesley/model_function_calling_10k_wesley.bin \
+    --output_dir=wesley/preselect_tokenized_wesley2 \
     --threshold=0.79

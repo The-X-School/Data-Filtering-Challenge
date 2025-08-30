@@ -9,8 +9,8 @@ import pandas as pd
 import json
 
 #install huggingface_hub with conda install huggingface_hub also install pandas and fastparquet
-wanted_clusters = [1,2];  #input from which cluster (out of 20)
-files_per_cluster  = 2;  #1 is normally fine --> max is 100
+wanted_clusters = [1,20];  #input from which cluster (out of 20)
+files_per_cluster  = 1;  #1 is normally fine --> max is 100
 rows_per_file = 1000;    #1000 is also normally fine
 foldername = "data" #creates a folder in current position --> can replace with path to put in other place
 
@@ -24,7 +24,7 @@ except FileExistsError:
 except Exception as e:
     print(f"An error occurred: {e}")
 
-HF_TOKEN = "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"
+HF_TOKEN = "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"
 login(token=HF_TOKEN)
 
 files = list_repo_files(repo_id="OptimalScale/ClimbLab", repo_type="dataset", token=HF_TOKEN)
