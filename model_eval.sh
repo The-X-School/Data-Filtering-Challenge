@@ -1,3 +1,8 @@
+conda activate lmflow
+conda install mpi4py
+
+cd Data-Filtering-Challenge
+
 bash train.sh --dataset_path wesley/preselect_tokenized_wesley2
 
 bash ./scripts/run_merge_dora.sh \
@@ -5,11 +10,11 @@ bash ./scripts/run_merge_dora.sh \
  --lora_model_path output_models/wesley_tokenized2 \
  --output_model_path output_models/wesley_tokenized2_merged
 
-cd ~/Data-Filtering-Challenge/lm-evaluation-harness
+cd lm-evaluation-harness
 pip install -e . 
 
 lm_eval --model hf \
-    --model_args pretrained=../output_models/dora_merged,trust_remote_code=True \
+    --model_args pretrained=../output_models/wesley_tokenized2_merged,trust_remote_code=True \
     --tasks elmb_roleplay,elmb_reasoning,elmb_functioncalling,elmb_chatrag \
     --device cuda:0 \
     --batch_size 1 \
