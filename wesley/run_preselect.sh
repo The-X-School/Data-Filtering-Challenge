@@ -15,8 +15,7 @@
 # pip install pydantic
 # pip install accelerate>=0.27.2
 # pip install einops>=0.6.1
-# pip install accelerate ndjson fasttext datatrove orjson datasets fasteners fasttext-numpy2-wheel
-
+# pip install accelerate ndjson fasttext datatrove orjson datasets fasteners fasttext-numpy2-wheel py-cpuinfo pyarrow
 #Create conda enviroment if not already created
 #conda create -n lmflow python=3.10.18 -y
 
