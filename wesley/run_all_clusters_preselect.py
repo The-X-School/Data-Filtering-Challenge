@@ -11,7 +11,7 @@ pass in the directory to all cluster files, output directory, threshold, and mod
 
 def run_preselect_filtering(input_file, output_dir, model_path, threshold, steps):
     command = [
-        "python", "Data_Filtering_Challenge/wesley/run_preselect_filtering.py",
+        "python", "Data-Filtering-Challenge/wesley/run_preselect_filtering.py",
         "--input_path", input_file,
         "--output_dir", output_dir,
         "--model_path", model_path,
@@ -56,7 +56,7 @@ def main():
     parser.add_argument("--output_dir", required=True, help="Directory to save the output files")
     parser.add_argument("--model_path", default="PreSelect-classifier.bin", help="Path to FastText model")
     parser.add_argument("--threshold", type=float, default=0.5, help="Classifier threshold")
-    parser.add_argument("--steps", type=str, default="1,2,3", help="Comma-separated list of steps to run")
+    parser.add_argument("--steps", type=str, default="0,1,2,3", help="Comma-separated list of steps to run")
 
     args = parser.parse_args()
 
