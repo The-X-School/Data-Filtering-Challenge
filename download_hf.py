@@ -11,7 +11,7 @@ import json
 #install huggingface_hub with conda install huggingface_hub also install pandas and fastparquet
 wanted_clusters = [1,2];  #input from which cluster (out of 20)
 files_per_cluster  = 2;  #1 is normally fine --> max is 100
-rows_per_file = 1000;    #1000 is also normally fine
+rows_per_file = 1000;    #1000 is also normally fine ---> set to -1 if you want to have full file
 foldername = "data" #creates a folder in current position --> can replace with path to put in other place
 
 
@@ -53,9 +53,14 @@ for j in wanted_clusters:
 
 
         #slicing row
-        sliced_rows = dataframe_dataset.iloc[0:rows_per_file]
-        print(f"First {rows_per_file}: {sliced_rows}")
-
+        sliced_rows = []
+        if(rows_per_file == -1):
+            sliced_rows = dataframe_dataset.iloc[0:]
+            print(f"all rows used within file, file size: {len(dataframe_dataset}")
+        else:
+            sliced_rows = dataframe_dataset.iloc[0:rows_per_file]
+            print(f"First {rows_per_file}: {sliced_rows}")
+        
         #convert to json
         json_sliced = sliced_rows.to_json(
         orient="records",
