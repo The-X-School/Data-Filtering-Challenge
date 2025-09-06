@@ -23,20 +23,20 @@ Instructions:
     Might need to also install these:
     `pip install datasets transformers datatrove orjson fasteners fasttext-numpy2-wheel`
 
-3. Run the script to download data from climblab. Due to constraints, we were not able to handle the entire dataset, so we just drew a sample from the climblab dataset. Previously we ran tests with random samples but that would make the result inconsistent, so we settled on pulling just the first million lines, or roughly 885,931,732 tokens from the dataset. Effectively, this also means that our program will not go over the 10b token limit. 
+2. Run the script to download data from climblab. Due to constraints, we were not able to handle the entire dataset, so we just drew a sample from the climblab dataset. Previously we ran tests with random samples but that would make the result inconsistent, so we settled on pulling just the first million lines, or 885,931,732 tokens from the dataset. Effectively, this also means that our program will not go over the 10b token limit. 
     Note: You might need to insert a working huggingface token into here for it to download.
     ```
     cd wesley
     python download_climblab_streaming.py
     ```
 
-5. Run the script to detokenize. The detokenized dataset should be saved to `detokenized/climblab/climblab.jsonl`.
+3. Run the script to detokenize. The detokenized dataset should be saved to `detokenized/climblab/climblab.jsonl`.
     ```
     python detokenize_climblab.py
     ```
     
 
-7. Run the trained preselect model on the data. A script exists to run it already. Make sure you are in `/Data-Filtering-Challenge` before running this.
+4. Run the trained preselect model on the data. Make sure you are in `/Data-Filtering-Challenge` before running this.
     ```
     python run_preselect_filtering.py \
     --input_path=detokenized/climblab/climblab.jsonl \
@@ -45,4 +45,4 @@ Instructions:
     --threshold=0.79
     ```
 
-    The resulting data should be stored in `wesley/preselect_detokenized`, in a few jsonl files. The resulting data should already be in the right format to use to train the model. Our version of the train.sh script is located in the Data-Filtering-Challenge repository if needed to run training/evaluation with the data. 
+    The resulting data should be stored in `wesley/preselect_detokenized`, in a few jsonl files. It should already be in the right format to use to train the model. Our version of the train.sh script is located in the Data-Filtering-Challenge repository if needed to run training/evaluation with the data. 
