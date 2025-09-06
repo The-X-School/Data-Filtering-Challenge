@@ -47,7 +47,7 @@ def main():
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
     steps = [int(s.strip()) for s in args.steps.split(",")]
-    preselect_script_dir = "Data-Filtering-Challenge/wesley"
+    preselect_script_dir = ""
 
     cluster_num = get_next_cluster_number(args.output_dir, args.input_path)
     cluster_prefix = f"cluster{cluster_num}"
