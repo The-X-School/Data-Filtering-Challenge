@@ -47,7 +47,6 @@ def main():
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
     steps = [int(s.strip()) for s in args.steps.split(",")]
-    preselect_script_dir = ""
 
     cluster_num = get_next_cluster_number(args.output_dir, args.input_path)
     cluster_prefix = f"cluster{cluster_num}"
@@ -57,20 +56,15 @@ def main():
     sorted_file = os.path.join(args.output_dir, f"{cluster_prefix}_sorted.jsonl")
     formatted_file = os.path.join(args.output_dir, f"{cluster_prefix}_formatted.jsonl")
 
-    # Step 0: Detokenize the data
-    if 0 in steps:
-        run_command(f"python {preselect_script_dir}/detokenize_climblab.py --input_path {args.input_path} --output_path {detokenized_file}")
-
     # Step 1: Run preselect_training.py
     if 1 in steps:
         run_command(
-            f"python {preselect_script_dir}/preselect_training.py "
-            f"--input_path={detokenized_file} "
+            f"python preselect_training.py "
+            f"--input_path={args.input_path} "
             f"--output_path={args.output_dir} "
             f"--model_path={args.model_path} "
             f"--threshold={args.threshold}"
         )
-        os.remove(detokenized_file)
         original_jsonl = find_latest_jsonl_file(args.output_dir)
         os.rename(original_jsonl, cluster_output_file)
         print(f"Renamed preselect output to: {cluster_output_file}")
@@ -79,14 +73,14 @@ def main():
 
     # Step 2: Sort the preselect output using sort_preselect.py
     if 2 in steps:
-        run_command(f"python {preselect_script_dir}/sort_preselect.py {cluster_output_file} {sorted_file}")
+        run_command(f"python sort_preselect.py {cluster_output_file} {sorted_file}")
         os.remove(cluster_output_file)
         print(f"Deleted original files : {cluster_output_file}")
 
     # Step 3: Format the preselect output
     if 3 in steps:
         run_command(
-            f"python {preselect_script_dir}/format_preselect.py "
+            f"python format_preselect.py "
             f"{sorted_file} {formatted_file}"
         )
         os.remove(sorted_file)
@@ -95,7 +89,7 @@ def main():
     # Step 4: Convert to LMFlow format
     if 4 in steps:
         run_command(
-            f"python {preselect_script_dir} format_data.py {formatted_file}"
+            f"python format_data.py {formatted_file}"
         )
 
         print(f"All steps completed successfully. Final file is at: {formatted_file}")
