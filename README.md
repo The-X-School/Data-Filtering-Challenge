@@ -17,6 +17,8 @@ Instructions:
     conda install mpi4py
     pip install -e .
     pip install -r requirements.txt
+    sudo apt-get install git-lfs
+    git lfs pull
     ```
     Might need to also install these:
     `pip install datasets transformers datatrove orjson fasteners fasttext-numpy2-wheel`
