@@ -74,7 +74,7 @@ for j in wanted_clusters:
         #write into the folder
         filename = f"cluster_{j}_{i}.json"
         if(rows_per_file !=0):
-           file_path = os.path.join(foldername, filename)
+            file_path = os.path.join(foldername, filename)
 
             with open(file_path, "w") as file:
                 file.write(json_sliced)
