@@ -4,7 +4,7 @@
 # Parses arguments
 model_name_or_path=data4elm/Llama-400M-12L
 # conversation_template=llama2
-output_dir=output_models/wesley_tokenized2
+output_dir=output_models/wesley_detokenized2
 deepspeed_args="--master_port=11000"
 
 # Safety related arguments

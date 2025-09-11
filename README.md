@@ -36,13 +36,13 @@ Instructions:
     ```
     
 
-4. Run the trained preselect model on the data. Make sure you are in `/Data-Filtering-Challenge` before running this.
+4. Run the trained preselect model on the data. Make sure you are in `/Data-Filtering-Challenge/wesley` before running this.
     ```
     python run_preselect_filtering.py \
-    --input_path=detokenized/climblab/climblab.jsonl \
+    --input_path=detokenized/climblab2/climblab.jsonl \
     --model_path=model_function_calling_10k_wesley.bin \
-    --output_dir=preselect_detokenized \
-    --threshold=0.79
+    --output_dir=preselect_detokenized3\
+    --threshold=0.82
     ```
 
     The resulting data should be stored in `wesley/preselect_detokenized`, in a few jsonl files. It should already be in the right format to use to train the model. Our version of the train.sh script is located in the Data-Filtering-Challenge repository if needed to run training/evaluation with the data. 
