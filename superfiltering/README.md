@@ -6,14 +6,14 @@ The pipeline first slices clusters according to a predicted distribution, then a
 ---
 
 ## Repo Structure
+data/
+├── filtered_clusters_example #filtered data from preselect filtered into 20 clusters
 
 superfiltering-regmix/  
 ├── superfiltering.py        # Main filtering script  
-├── regmix_preprocess.py     # (Optional) Script to slice raw RegMix clusters  
-├── requirements.txt         # Dependencies  
 ├── README.md                # Documentation  
-├── data/                    # Place your RegMix cluster files here (not tracked by git)  
 
+requirements.txt #requirements download txt
 ---
 
 ## Setup
@@ -32,20 +32,7 @@ pip install fastparquet pandas
 
 ## Data Preparation
 
-1. Download the [RegMix dataset (20 clusters)](https://huggingface.co/datasets/OptimalScale/ClimbLab/tree/main).  
-2. Run the preprocessing script to slice each cluster based on the predicted distribution:
-
-python regmix_preprocess.py
-
-This will generate JSON cluster files in a `new_data/` folder:
-
-new_data/  
- ├── cluster_1.json  
- ├── cluster_2.json  
- ...  
- └── cluster_20.json  
-
----
+All data was prepared in the previous steps with the preselect model.
 
 ## Run Superfiltering
 
@@ -67,10 +54,8 @@ python superfiltering.py --input_folder new_data --output data/filtered_regmix.j
 ---
 
 ## Notes
-
-- The dataset itself is **not included** in this repo (due to size). You’ll need to download it from Hugging Face.  
-- Filtering can take time depending on dataset size and model choice. Consider batching or using a GPU environment for speed.  
-- For strict reproducibility with the official [Superfiltering paper](https://arxiv.org/abs/2402.00530), you may need to adapt your dataset format to match their repo’s expected schema.  
+ 
+- For strict reproducibility with the official [Superfiltering paper](https://arxiv.org/abs/2402.00530).
 
 ---
 
