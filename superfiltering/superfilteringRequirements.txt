@@ -1,0 +1,23 @@
+# Core filtering + NeMo
+nemo_toolkit[nlp]==1.20.0
+datasets==2.13.0
+huggingface_hub==0.15.1
+
+# Compatible deps
+numpy==1.23.5
+transformers==4.31.0
+torch==2.0.1
+tokenizers==0.13.3
+sentencepiece==0.2.0
+peft==0.15.2
+evaluate==0.4.0
+accelerate==0.27.2
+bitsandbytes==0.40.0
+einops==0.6.1
+wandb==0.15.12
+deepspeed==0.14.4
+
+# Utils
+pydantic==1.10.12
+fastparquet==2023.8.0
+pandas==2.0.3
