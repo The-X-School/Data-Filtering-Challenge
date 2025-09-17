@@ -30,22 +30,22 @@ def filter_cluster_file(input_path, output_path, model_name="nvidia/quality-clas
     keep_indices = []
     for i, pred in enumerate(predictions):
         if isinstance(pred, dict):
-            score = pred.get('logits', [0, 0])[1]  # fallback if logits key exists
+            score = pred.get('logits', [0, 0])[1]
         else:
-            score = pred[1]  # fallback if list
+            score = pred[1]
         if score > 0.5:
             keep_indices.append(i)
 
     filtered = dataset.select(keep_indices)
 
-    # Save filtered cluster
-    filtered.to_json(output_path)
+    # Save filtered cluster as JSONL
+    filtered.to_json(output_path, orient="records", lines=True)
     print(f"💾 Saved filtered cluster: {os.path.basename(output_path)} | "
           f"original: {len(dataset)}, filtered: {len(filtered)}")
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_folder", required=True, help="Folder with cluster JSON files")
+    parser.add_argument("--input_folder", required=True, help="Folder with cluster JSONL files")
     parser.add_argument("--output_folder", required=True, help="Folder to save filtered clusters")
     parser.add_argument("--model", default="nvidia/quality-classifier-deberta", help="Filtering model")
     args = parser.parse_args()
@@ -54,7 +54,7 @@ def main():
 
     files_found = 0
     for filename in os.listdir(args.input_folder):
-        if filename.endswith(".json"):
+        if filename.endswith(".jsonl"):
             files_found += 1
             input_path = os.path.join(args.input_folder, filename)
             output_path = os.path.join(args.output_folder, filename)
@@ -64,7 +64,7 @@ def main():
             print(f"✅ Finished cluster {filename}")
 
     if files_found == 0:
-        print("⚠️ No JSON files found in input folder.")
+        print("⚠️ No JSONL files found in input folder.")
 
     print("\n🎉 All clusters processed.")
 
