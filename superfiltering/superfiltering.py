@@ -1,24 +1,31 @@
 import argparse
 import os
-from datasets import load_dataset
+import json
+from datasets import Dataset
 from nemo.collections.nlp.models import TextClassificationModel
 
-from datasets import load_dataset
-
 def filter_cluster_file(input_path, output_path, model_name="nvidia/quality-classifier-deberta"):
-    print(f"\n📥 Loading cluster: {os.path.basename(input_path)} ...")
-    dataset = load_dataset("json", data_files={"train": input_path}, split="train", download_mode="force_redownload")
+    print(f"\n=== Processing cluster: {os.path.basename(input_path)} ===")
+    
+    # Load JSONL manually
+    print(f"📥 Loading cluster: {os.path.basename(input_path)} ...")
+    with open(input_path, "r", encoding="utf-8") as f:
+        data = [json.loads(line) for line in f]
+
+    if not data:
+        print(f"⚠️ Cluster {input_path} is empty, skipping.")
+        return
 
     # Detect text column
     text_col = None
     for col in ["text", "content", "sentence", "body"]:
-        if col in dataset.column_names:
+        if col in data[0]:
             text_col = col
             break
     if text_col is None:
         raise ValueError(f"No suitable text column found in {input_path}")
 
-    texts = dataset[text_col]
+    texts = [item[text_col] for item in data]
 
     # Load classifier
     print(f"🤖 Loading model: {model_name} ...")
@@ -28,9 +35,10 @@ def filter_cluster_file(input_path, output_path, model_name="nvidia/quality-clas
     print(f"🔍 Filtering cluster with {len(texts)} items ...")
     predictions = classifier.predict(texts)
 
-    # Determine which items to keep
+    # Keep only high-quality items
     keep_indices = []
     for i, pred in enumerate(predictions):
+        # Some models return dict with logits, some return list
         if isinstance(pred, dict):
             score = pred.get('logits', [0, 0])[1]
         else:
@@ -38,12 +46,16 @@ def filter_cluster_file(input_path, output_path, model_name="nvidia/quality-clas
         if score > 0.5:
             keep_indices.append(i)
 
-    filtered = dataset.select(keep_indices)
+    filtered_data = [data[i] for i in keep_indices]
 
     # Save filtered cluster as JSONL
-    filtered.to_json(output_path, orient="records", lines=True)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        for item in filtered_data:
+            f.write(json.dumps(item, ensure_ascii=False) + "\n")
+
     print(f"💾 Saved filtered cluster: {os.path.basename(output_path)} | "
-          f"original: {len(dataset)}, filtered: {len(filtered)}")
+          f"original: {len(data)}, filtered: {len(filtered_data)}")
 
 
 def main():
@@ -55,21 +67,17 @@ def main():
 
     os.makedirs(args.output_folder, exist_ok=True)
 
-    files_found = 0
-    for filename in os.listdir(args.input_folder):
-        if filename.endswith(".jsonl"):
-            files_found += 1
-            input_path = os.path.join(args.input_folder, filename)
-            output_path = os.path.join(args.output_folder, filename)
+    cluster_files = [f for f in os.listdir(args.input_folder) if f.endswith(".jsonl")]
+    if not cluster_files:
+        print(f"⚠️ No .jsonl files found in {args.input_folder}")
+        return
 
-            print(f"\n=== Processing cluster {files_found}: {filename} ===")
-            filter_cluster_file(input_path, output_path, args.model)
-            print(f"✅ Finished cluster {filename}")
+    for idx, filename in enumerate(cluster_files, start=1):
+        input_path = os.path.join(args.input_folder, filename)
+        output_path = os.path.join(args.output_folder, filename)
+        print(f"\n=== Processing cluster {idx}: {filename} ===")
+        filter_cluster_file(input_path, output_path, args.model)
 
-    if files_found == 0:
-        print("⚠️ No JSONL files found in input folder.")
-
-    print("\n🎉 All clusters processed.")
 
 if __name__ == "__main__":
     main()
