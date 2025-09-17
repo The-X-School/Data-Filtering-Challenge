@@ -3,9 +3,11 @@ import os
 from datasets import load_dataset
 from nemo.collections.nlp.models import TextClassificationModel
 
+from datasets import load_dataset
+
 def filter_cluster_file(input_path, output_path, model_name="nvidia/quality-classifier-deberta"):
     print(f"\n📥 Loading cluster: {os.path.basename(input_path)} ...")
-    dataset = load_dataset("json", data_files=input_path)["train"]
+    dataset = load_dataset("json", data_files={"train": input_path}, split="train", download_mode="force_redownload")
 
     # Detect text column
     text_col = None
@@ -42,6 +44,7 @@ def filter_cluster_file(input_path, output_path, model_name="nvidia/quality-clas
     filtered.to_json(output_path, orient="records", lines=True)
     print(f"💾 Saved filtered cluster: {os.path.basename(output_path)} | "
           f"original: {len(dataset)}, filtered: {len(filtered)}")
+
 
 def main():
     parser = argparse.ArgumentParser()
