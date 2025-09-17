@@ -10,7 +10,7 @@ pyyaml==6.0
 
 # Compatible deps
 numpy==1.23.5
-transformers==4.28.0
+transformers==4.21.2
 torch==2.0.1
 tokenizers==0.13.3
 sentencepiece==0.2.0
