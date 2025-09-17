@@ -9,8 +9,19 @@ def filter_cluster_file(input_path, output_path, model_name="nvidia/quality-clas
 
     # Load classifier
     classifier = TextClassificationModel.from_pretrained(model_name)
-    texts = dataset["text"] if "text" in dataset.column_names else dataset["content"]
+    
+    # Determine text column
+    if "text" in dataset.column_names:
+        texts = dataset["text"]
+    elif "content" in dataset.column_names:
+        texts = dataset["content"]
+    else:
+        raise ValueError("No text column found in dataset (expected 'text' or 'content')")
+
+    # Predict quality scores
     scores = classifier.predict(texts)
+
+    # Keep high-quality items (score > 0.5)
     keep_indices = [i for i, s in enumerate(scores) if s[1] > 0.5]
     filtered = dataset.select(keep_indices)
 
@@ -27,6 +38,7 @@ def main():
 
     os.makedirs(args.output_folder, exist_ok=True)
 
+    # Loop over input clusters
     for filename in os.listdir(args.input_folder):
         if filename.endswith(".json"):
             input_path = os.path.join(args.input_folder, filename)
