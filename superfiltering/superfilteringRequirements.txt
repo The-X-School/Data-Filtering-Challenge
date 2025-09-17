@@ -1,9 +1,10 @@
-#cython
+# Cython
 cython==0.29.36
 
 # Core filtering + NeMo
-nemo_toolkit[nlp]==1.20.0
+nemo_toolkit[nlp]==1.13.0
 datasets==2.13.0
+pyarrow==10.0.1
 huggingface_hub==0.15.1
 
 # Compatible deps
