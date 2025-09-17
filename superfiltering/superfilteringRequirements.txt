@@ -1,3 +1,6 @@
+#cython
+Cython==0.29.36
+
 # Core filtering + NeMo
 nemo_toolkit[nlp]==1.20.0
 datasets==2.13.0
