@@ -22,15 +22,10 @@ def load_clusters(folder):
     return combined
 
 def filter_dataset(dataset, model_name="nvidia/quality-classifier-deberta"):
-    """Apply superfiltering using a small model"""
-    # Use modern NeMo API
     classifier = TextClassificationModel.from_pretrained(model_name)
-    
-    # NeMo's TextClassificationModel outputs logits; filter manually
-    # For example, keep samples predicted as "high quality"
     texts = dataset["text"] if "text" in dataset.column_names else dataset["content"]
-    scores = classifier.predict(texts)  # adjust depending on output format
-    keep_indices = [i for i, s in enumerate(scores) if s[1] > 0.5]  # assume binary quality
+    scores = classifier.predict(texts)
+    keep_indices = [i for i, s in enumerate(scores) if s[1] > 0.5]  # adjust threshold
     filtered = dataset.select(keep_indices)
     return filtered
 
