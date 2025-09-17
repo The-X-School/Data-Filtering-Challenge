@@ -1,71 +1,71 @@
-import argparse
 import os
 import json
-from datasets import load_dataset, Dataset
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
-import torch.nn.functional as F
+import boto3
+import argparse
+from datasets import load_dataset
+from transformers import pipeline
 
-def filter_cluster_file(input_path, output_path, model_name="distilbert-base-uncased-finetuned-sst-2-english", threshold=0.5):
-    print(f"\n=== Processing cluster: {os.path.basename(input_path)} ===")
-    print(f"📥 Loading cluster: {os.path.basename(input_path)} ...")
+s3 = boto3.client("s3")
 
-    # Load .jsonl as Dataset
-    with open(input_path, "r") as f:
-        data = [json.loads(line) for line in f]
-    dataset = Dataset.from_list(data)
+def filter_cluster_file(input_bucket, input_key, output_bucket, output_prefix, model_name, threshold=0.5):
+    local_input = f"/tmp/{os.path.basename(input_key)}"
+    local_output = f"/tmp/{os.path.basename(input_key)}"
 
-    # Load tokenizer and model
-    print("🤖 Loading model:", model_name)
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSequenceClassification.from_pretrained(model_name)
-    model.eval()
+    print(f"📥 Downloading {input_key} from s3://{input_bucket} ...")
+    s3.download_file(input_bucket, input_key, local_input)
 
-    # Move to GPU if available
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    print(f"📥 Loading dataset from {local_input} ...")
+    dataset = load_dataset(
+        "json",
+        data_files={"train": local_input},
+        split="train",
+        cache_dir="/tmp/hf_cache"
+    )
+
+    print(f"🤖 Loading model: {model_name}")
+    classifier = pipeline("text-classification", model=model_name, device=-1)
 
     texts = dataset["text"] if "text" in dataset.column_names else dataset["content"]
 
-    keep_indices = []
-    batch_size = 32
-    for i in range(0, len(texts), batch_size):
-        batch_texts = texts[i:i+batch_size]
-        encodings = tokenizer(batch_texts, padding=True, truncation=True, return_tensors="pt").to(device)
-        with torch.no_grad():
-            outputs = model(**encodings)
-            probs = F.softmax(outputs.logits, dim=-1)
-            # Assuming label 1 is "keep"
-            for j, p in enumerate(probs):
-                if p[1] > threshold:
-                    keep_indices.append(i + j)
+    print(f"⚡ Running classification on {len(texts)} samples...")
+    preds = classifier(texts, truncation=True, batch_size=16)
 
+    keep_indices = [i for i, p in enumerate(preds) if (p["label"] == "POSITIVE" and p["score"] >= threshold)]
     filtered = dataset.select(keep_indices)
 
-    # Save filtered cluster as .jsonl
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, "w") as f:
-        for row in filtered:
-            f.write(json.dumps(row) + "\n")
-    print(f"💾 Saved filtered cluster to {output_path} ({len(filtered)} samples)")
+    # Save to JSONL
+    print(f"💾 Saving filtered results to {local_output} ({len(filtered)} samples)")
+    with open(local_output, "w") as f:
+        for record in filtered.to_dict():
+            f.write(json.dumps(record) + "\n")
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input_folder", required=True, help="Folder with cluster JSONL files")
-    parser.add_argument("--output_folder", required=True, help="Folder to save filtered clusters")
-    parser.add_argument("--model", default="distilbert-base-uncased-finetuned-sst-2-english", help="Filtering model")
-    parser.add_argument("--threshold", type=float, default=0.5, help="Probability threshold for keeping samples")
-    args = parser.parse_args()
+    # Upload back to S3
+    output_key = os.path.join(output_prefix, os.path.basename(input_key))
+    print(f"☁️ Uploading {local_output} to s3://{output_bucket}/{output_key}")
+    s3.upload_file(local_output, output_bucket, output_key)
 
-    os.makedirs(args.output_folder, exist_ok=True)
 
-    cluster_files = [f for f in os.listdir(args.input_folder) if f.endswith(".jsonl")]
-    cluster_files.sort()
-    for idx, filename in enumerate(cluster_files, 1):
-        input_path = os.path.join(args.input_folder, filename)
-        output_path = os.path.join(args.output_folder, filename)
-        print(f"\n=== Processing cluster {idx}: {filename} ===")
-        filter_cluster_file(input_path, output_path, args.model, args.threshold)
+def lambda_handler(event, context):
+    """
+    event example:
+    {
+      "input_bucket": "my-input-bucket",
+      "input_keys": ["clusters/cluster1.jsonl", "clusters/cluster2.jsonl"],
+      "output_bucket": "my-output-bucket",
+      "output_prefix": "filtered",
+      "model": "distilbert-base-uncased-finetuned-sst-2-english",
+      "threshold": 0.5
+    }
+    """
+    input_bucket = event["input_bucket"]
+    input_keys = event["input_keys"]
+    output_bucket = event["output_bucket"]
+    output_prefix = event.get("output_prefix", "filtered")
+    model_name = event.get("model", "distilbert-base-uncased-finetuned-sst-2-english")
+    threshold = float(event.get("threshold", 0.5))
 
-if __name__ == "__main__":
-    main()
+    for i, key in enumerate(input_keys, start=1):
+        print(f"\n=== Processing cluster {i}: {key} ===")
+        filter_cluster_file(input_bucket, key, output_bucket, output_prefix, model_name, threshold)
+
+    return {"status": "done", "processed_files": input_keys}
