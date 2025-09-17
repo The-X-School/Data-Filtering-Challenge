@@ -1,83 +1,71 @@
 import argparse
 import os
 import json
-from datasets import Dataset
-from nemo.collections.nlp.models import TextClassificationModel
+from datasets import load_dataset, Dataset
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+import torch.nn.functional as F
 
-def filter_cluster_file(input_path, output_path, model_name="nvidia/quality-classifier-deberta"):
+def filter_cluster_file(input_path, output_path, model_name="distilbert-base-uncased-finetuned-sst-2-english", threshold=0.5):
     print(f"\n=== Processing cluster: {os.path.basename(input_path)} ===")
-    
-    # Load JSONL manually
     print(f"📥 Loading cluster: {os.path.basename(input_path)} ...")
-    with open(input_path, "r", encoding="utf-8") as f:
+
+    # Load .jsonl as Dataset
+    with open(input_path, "r") as f:
         data = [json.loads(line) for line in f]
+    dataset = Dataset.from_list(data)
 
-    if not data:
-        print(f"⚠️ Cluster {input_path} is empty, skipping.")
-        return
+    # Load tokenizer and model
+    print("🤖 Loading model:", model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSequenceClassification.from_pretrained(model_name)
+    model.eval()
 
-    # Detect text column
-    text_col = None
-    for col in ["text", "content", "sentence", "body"]:
-        if col in data[0]:
-            text_col = col
-            break
-    if text_col is None:
-        raise ValueError(f"No suitable text column found in {input_path}")
+    # Move to GPU if available
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
 
-    texts = [item[text_col] for item in data]
+    texts = dataset["text"] if "text" in dataset.column_names else dataset["content"]
 
-    # Load classifier
-    print(f"🤖 Loading model: {model_name} ...")
-    classifier = TextClassificationModel.from_pretrained(model_name)
-
-    # Predict quality
-    print(f"🔍 Filtering cluster with {len(texts)} items ...")
-    predictions = classifier.predict(texts)
-
-    # Keep only high-quality items
     keep_indices = []
-    for i, pred in enumerate(predictions):
-        # Some models return dict with logits, some return list
-        if isinstance(pred, dict):
-            score = pred.get('logits', [0, 0])[1]
-        else:
-            score = pred[1]
-        if score > 0.5:
-            keep_indices.append(i)
+    batch_size = 32
+    for i in range(0, len(texts), batch_size):
+        batch_texts = texts[i:i+batch_size]
+        encodings = tokenizer(batch_texts, padding=True, truncation=True, return_tensors="pt").to(device)
+        with torch.no_grad():
+            outputs = model(**encodings)
+            probs = F.softmax(outputs.logits, dim=-1)
+            # Assuming label 1 is "keep"
+            for j, p in enumerate(probs):
+                if p[1] > threshold:
+                    keep_indices.append(i + j)
 
-    filtered_data = [data[i] for i in keep_indices]
+    filtered = dataset.select(keep_indices)
 
-    # Save filtered cluster as JSONL
+    # Save filtered cluster as .jsonl
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
-        for item in filtered_data:
-            f.write(json.dumps(item, ensure_ascii=False) + "\n")
-
-    print(f"💾 Saved filtered cluster: {os.path.basename(output_path)} | "
-          f"original: {len(data)}, filtered: {len(filtered_data)}")
-
+    with open(output_path, "w") as f:
+        for row in filtered:
+            f.write(json.dumps(row) + "\n")
+    print(f"💾 Saved filtered cluster to {output_path} ({len(filtered)} samples)")
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_folder", required=True, help="Folder with cluster JSONL files")
     parser.add_argument("--output_folder", required=True, help="Folder to save filtered clusters")
-    parser.add_argument("--model", default="nvidia/quality-classifier-deberta", help="Filtering model")
+    parser.add_argument("--model", default="distilbert-base-uncased-finetuned-sst-2-english", help="Filtering model")
+    parser.add_argument("--threshold", type=float, default=0.5, help="Probability threshold for keeping samples")
     args = parser.parse_args()
 
     os.makedirs(args.output_folder, exist_ok=True)
 
     cluster_files = [f for f in os.listdir(args.input_folder) if f.endswith(".jsonl")]
-    if not cluster_files:
-        print(f"⚠️ No .jsonl files found in {args.input_folder}")
-        return
-
-    for idx, filename in enumerate(cluster_files, start=1):
+    cluster_files.sort()
+    for idx, filename in enumerate(cluster_files, 1):
         input_path = os.path.join(args.input_folder, filename)
         output_path = os.path.join(args.output_folder, filename)
         print(f"\n=== Processing cluster {idx}: {filename} ===")
-        filter_cluster_file(input_path, output_path, args.model)
-
+        filter_cluster_file(input_path, output_path, args.model, args.threshold)
 
 if __name__ == "__main__":
     main()
