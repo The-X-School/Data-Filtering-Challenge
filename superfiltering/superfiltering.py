@@ -20,7 +20,7 @@ classifier = pipeline(
     "text-classification",
     model=MODEL_NAME,
     framework="pt",
-    device=0,  # GPU (A100)
+    device=0,  # use GPU (A100)
     batch_size=16,
     truncation=True
 )
@@ -48,7 +48,10 @@ for filename in os.listdir(INPUT_FOLDER):
         preds = classifier(texts)
 
         # Filter records
-        keep_indices = [i for i, p in enumerate(preds) if (p["label"] == "POSITIVE" and p["score"] >= THRESHOLD)]
+        keep_indices = [
+            i for i, p in enumerate(preds)
+            if (p["label"] == "POSITIVE" and p["score"] >= THRESHOLD)
+        ]
         filtered = dataset.select(keep_indices)
         all_records.extend(filtered)
 
