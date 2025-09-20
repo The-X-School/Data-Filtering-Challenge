@@ -2,7 +2,10 @@ import os
 import json
 import argparse
 from datasets import load_dataset
-from transformers import pipeline
+from transformers import pipeline, set_seed
+
+# Force transformers to use PyTorch
+os.environ["USE_TF"] = "0"
 
 def filter_cluster_file(input_path, output_folder, model_name, threshold=0.5):
     filename = os.path.basename(input_path)
@@ -59,7 +62,6 @@ def main():
             f.write(json.dumps(record) + "\n")
 
     print(f"✅ Saved complete filtered dataset to {final_output_file}")
-
 
 if __name__ == "__main__":
     main()
