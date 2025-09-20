@@ -1,64 +1,65 @@
 import os
 import json
+import argparse
 from datasets import load_dataset
 from transformers import pipeline
 
-INPUT_FOLDER = "/home/ubuntu/Data-Filtering-Challenge/data/preselect_80"
-OUTPUT_FOLDER = "/home/ubuntu/Data-Filtering-Challenge/superfiltering/output"
-MODEL_NAME = "nvidia/quality-classifier-deberta"
-THRESHOLD = 0.5
+def filter_cluster_file(input_path, output_folder, model_name, threshold=0.5):
+    filename = os.path.basename(input_path)
+    output_file = os.path.join(output_folder, f"filtered_{filename}")
 
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+    print(f"⚡ Processing {input_path} ...")
 
-# Force PyTorch (avoid TensorFlow errors)
-import os
-os.environ["USE_TF"] = "0"
-
-# Load model once
-classifier = pipeline(
-    "text-classification",
-    model=MODEL_NAME,
-    device=-1,
-    framework="pt"
-)
-
-def filter_local_file(file_path, output_folder, classifier, threshold=0.5):
-    print(f"⚡ Processing {file_path} ...")
-    
     dataset = load_dataset(
         "json",
-        data_files={"train": file_path},
+        data_files={"train": input_path},
         split="train"
     )
-    
+
     texts = dataset["text"] if "text" in dataset.column_names else dataset["content"]
+
+    print(f"🤖 Loading model: {model_name}")
+    classifier = pipeline("text-classification", model=model_name, device=-1)
+
+    print(f"⚡ Running classification on {len(texts)} samples...")
     preds = classifier(texts, truncation=True, batch_size=16)
-    
+
     keep_indices = [i for i, p in enumerate(preds) if (p["label"] == "POSITIVE" and p["score"] >= threshold)]
     filtered = dataset.select(keep_indices)
-    
+
     # Save filtered cluster
-    output_file = os.path.join(output_folder, f"filtered_{os.path.basename(file_path)}")
+    os.makedirs(output_folder, exist_ok=True)
     with open(output_file, "w") as f:
         for record in filtered:
             f.write(json.dumps(record) + "\n")
-    
+
     print(f"✅ Saved filtered cluster to {output_file}")
     return filtered
 
-# Run on all JSONL files in INPUT_FOLDER
-all_records = []
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_folder", type=str, required=True, help="Folder containing cluster JSONL files")
+    parser.add_argument("--output_folder", type=str, required=True, help="Folder to save filtered clusters")
+    parser.add_argument("--model", type=str, default="distilbert-base-uncased-finetuned-sst-2-english")
+    parser.add_argument("--threshold", type=float, default=0.5)
+    args = parser.parse_args()
 
-for filename in os.listdir(INPUT_FOLDER):
-    if filename.endswith(".jsonl"):
-        file_path = os.path.join(INPUT_FOLDER, filename)
-        filtered = filter_local_file(file_path, OUTPUT_FOLDER, classifier, THRESHOLD)
-        all_records.extend(filtered)
+    all_records = []
 
-# Save everything to a single JSONL file
-final_output_file = os.path.join(OUTPUT_FOLDER, "filtered_dataset.json")
-with open(final_output_file, "w") as f:
-    for record in all_records:
-        f.write(json.dumps(record) + "\n")
+    for filename in os.listdir(args.input_folder):
+        if filename.endswith(".jsonl"):
+            file_path = os.path.join(args.input_folder, filename)
+            filtered = filter_cluster_file(file_path, args.output_folder, args.model, args.threshold)
+            all_records.extend(filtered)
 
-print(f"✅ Saved complete filtered dataset to {final_output_file}")
+    # Save everything to a single JSONL file
+    final_output_file = os.path.join(args.output_folder, "filtered_dataset.json")
+    with open(final_output_file, "w") as f:
+        for record in all_records:
+            f.write(json.dumps(record) + "\n")
+
+    print(f"✅ Saved complete filtered dataset to {final_output_file}")
+
+
+if __name__ == "__main__":
+    main()
