@@ -21,14 +21,18 @@ def filter_cluster_file(input_path, output_folder, model_name, threshold=0.5):
 
     # Ensure we always extract string text safely
     if "text" in dataset.column_names:
-        texts = [str(x) for x in dataset["text"]]
+        texts = [str(x) if not isinstance(x, str) else x for x in dataset["text"]]
     elif "content" in dataset.column_names:
-        texts = [str(x) for x in dataset["content"]]
+        texts = [str(x) if not isinstance(x, str) else x for x in dataset["content"]]
     else:
         raise ValueError(
             f"❌ No 'text' or 'content' column found in {input_path}. "
             f"Available columns: {dataset.column_names}"
         )
+
+    # Debug: check first few samples
+    print("Sample texts for classification:", texts[:5])
+    print("Type of first item:", type(texts[0]))
 
     print(f"🤖 Loading model: {model_name}")
     classifier = pipeline("text-classification", model=model_name, device=-1)
@@ -38,7 +42,7 @@ def filter_cluster_file(input_path, output_folder, model_name, threshold=0.5):
 
     keep_indices = [
         i for i, p in enumerate(preds)
-        if (p["label"] == "POSITIVE" and p["score"] >= threshold)
+        if (p["label"].upper() == "POSITIVE" and p["score"] >= threshold)
     ]
     filtered = dataset.select(keep_indices)
 
