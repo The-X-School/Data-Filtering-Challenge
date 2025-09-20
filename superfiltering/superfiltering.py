@@ -10,9 +10,8 @@ import tqdm
 
 os.environ["USE_TF"] = "0"
 
-def extract_tokens_column(dataset):
+def extract_tokens_column(dataset, tokenizer):
     """Extract tokens or text as GPT-2 token IDs"""
-    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
     if "tokens" in dataset.column_names:
         all_tokens = []
         for x in dataset["tokens"]:
@@ -30,6 +29,10 @@ def extract_tokens_column(dataset):
 
 def compute_gpt2_embeddings(token_lists, model, tokenizer, device="cpu", batch_size=16):
     """Compute mean GPT-2 embeddings for token ID sequences"""
+    # Ensure tokenizer has a pad token
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
     embeddings = []
     for i in tqdm.tqdm(range(0, len(token_lists), batch_size), desc="Computing embeddings"):
         batch_tokens = token_lists[i:i+batch_size]
@@ -46,18 +49,13 @@ def compute_gpt2_embeddings(token_lists, model, tokenizer, device="cpu", batch_s
             embeddings.append(batch_embeds)
     return np.vstack(embeddings)
 
-def filter_cluster_file(input_path, output_folder, threshold=0.5):
+def filter_cluster_file(input_path, output_folder, tokenizer, model, device="cpu", threshold=0.5):
     filename = os.path.basename(input_path)
     output_file = os.path.join(output_folder, f"filtered_{filename}")
 
     print(f"⚡ Processing {input_path} ...")
     dataset = load_dataset("json", data_files={"train": input_path}, split="train")
-    token_lists = extract_tokens_column(dataset)
-
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
-    model = GPT2Model.from_pretrained("gpt2").to(device)
-    model.eval()
+    token_lists = extract_tokens_column(dataset, tokenizer)
 
     embeddings = compute_gpt2_embeddings(token_lists, model, tokenizer, device=device)
 
@@ -84,11 +82,20 @@ def main():
     parser.add_argument("--threshold", type=float, default=0.0)
     args = parser.parse_args()
 
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    # Load tokenizer and model once
+    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    model = GPT2Model.from_pretrained("gpt2").to(device)
+    model.eval()
+
     all_records = []
     for filename in os.listdir(args.input_folder):
         if filename.endswith(".jsonl"):
             file_path = os.path.join(args.input_folder, filename)
-            filtered = filter_cluster_file(file_path, args.output_folder, args.threshold)
+            filtered = filter_cluster_file(file_path, args.output_folder, tokenizer, model, device, args.threshold)
             all_records.extend(filtered)
 
     final_output_file = os.path.join(args.output_folder, "filtered_dataset.jsonl")
