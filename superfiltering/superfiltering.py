@@ -10,6 +10,8 @@ import tqdm
 
 os.environ["USE_TF"] = "0"
 
+MAX_LEN = 1024  # GPT-2 maximum context length
+
 def extract_tokens_column(dataset, tokenizer):
     """Extract tokens or text as GPT-2 token IDs"""
     if "tokens" in dataset.column_names:
@@ -29,13 +31,16 @@ def extract_tokens_column(dataset, tokenizer):
 
 def compute_gpt2_embeddings(token_lists, model, tokenizer, device="cpu", batch_size=16):
     """Compute mean GPT-2 embeddings for token ID sequences"""
-    # Ensure tokenizer has a pad token
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
     embeddings = []
+
     for i in tqdm.tqdm(range(0, len(token_lists), batch_size), desc="Computing embeddings"):
         batch_tokens = token_lists[i:i+batch_size]
+        # truncate sequences longer than GPT-2 context size
+        batch_tokens = [tokens[:MAX_LEN] for tokens in batch_tokens]
+
         batch_enc = tokenizer.pad(
             {"input_ids": batch_tokens},
             padding=True,
@@ -43,13 +48,15 @@ def compute_gpt2_embeddings(token_lists, model, tokenizer, device="cpu", batch_s
         )
         input_ids = batch_enc["input_ids"].to(device)
         attention_mask = batch_enc["attention_mask"].to(device)
+
         with torch.no_grad():
             outputs = model(input_ids=input_ids, attention_mask=attention_mask)
             batch_embeds = outputs.last_hidden_state.mean(dim=1).cpu().numpy()
             embeddings.append(batch_embeds)
+
     return np.vstack(embeddings)
 
-def filter_cluster_file(input_path, output_folder, tokenizer, model, device="cpu", threshold=0.5):
+def filter_cluster_file(input_path, output_folder, tokenizer, model, device, threshold=0.5):
     filename = os.path.basename(input_path)
     output_file = os.path.join(output_folder, f"filtered_{filename}")
 
@@ -83,11 +90,10 @@ def main():
     args = parser.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Using device: {device}")
 
-    # Load tokenizer and model once
+    # load tokenizer and model once
     tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
     model = GPT2Model.from_pretrained("gpt2").to(device)
     model.eval()
 
