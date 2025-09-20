@@ -1,7 +1,7 @@
 import os
 import json
 import argparse
-from datasets import load_dataset
+from datasets import Dataset
 from transformers import GPT2Model, GPT2TokenizerFast
 import torch
 import numpy as np
@@ -11,6 +11,22 @@ import tqdm
 os.environ["USE_TF"] = "0"
 
 MAX_LEN = 1024  # GPT-2 maximum context length
+
+
+def safe_load_jsonl(path):
+    """Load JSONL manually and skip malformed/empty lines"""
+    records = []
+    with open(path, "r") as f:
+        for i, line in enumerate(f, start=1):
+            line = line.strip()
+            if not line:
+                continue  # skip blank lines
+            try:
+                records.append(json.loads(line))
+            except json.JSONDecodeError as e:
+                print(f"⚠️ Skipping malformed line {i} in {path}: {e}")
+    return Dataset.from_list(records)
+
 
 def extract_tokens_column(dataset, tokenizer):
     """Extract tokens or text as GPT-2 token IDs"""
@@ -28,6 +44,7 @@ def extract_tokens_column(dataset, tokenizer):
         return [tokenizer.encode(str(x), add_special_tokens=False) for x in dataset["text"]]
     else:
         raise ValueError(f"No 'tokens' or 'text' column found. Columns: {dataset.column_names}")
+
 
 def compute_gpt2_embeddings(token_lists, model, tokenizer, device="cpu", batch_size=16):
     """Compute mean GPT-2 embeddings for token ID sequences"""
@@ -56,12 +73,17 @@ def compute_gpt2_embeddings(token_lists, model, tokenizer, device="cpu", batch_s
 
     return np.vstack(embeddings)
 
+
 def filter_cluster_file(input_path, output_folder, tokenizer, model, device, threshold=0.5):
     filename = os.path.basename(input_path)
     output_file = os.path.join(output_folder, f"filtered_{filename}")
 
     print(f"⚡ Processing {input_path} ...")
-    dataset = load_dataset("json", data_files={"train": input_path}, split="train")
+    dataset = safe_load_jsonl(input_path)
+    if len(dataset) == 0:
+        print(f"❌ Skipping {input_path}, no valid JSON found.")
+        return []
+
     token_lists = extract_tokens_column(dataset, tokenizer)
 
     embeddings = compute_gpt2_embeddings(token_lists, model, tokenizer, device=device)
@@ -81,6 +103,7 @@ def filter_cluster_file(input_path, output_folder, tokenizer, model, device, thr
 
     print(f"✅ Saved filtered cluster to {output_file}")
     return filtered
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -110,6 +133,7 @@ def main():
             f.write(json.dumps(record) + "\n")
 
     print(f"✅ Saved complete filtered dataset to {final_output_file}")
+
 
 if __name__ == "__main__":
     main()
