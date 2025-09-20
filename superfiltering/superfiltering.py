@@ -5,14 +5,14 @@ from datasets import load_dataset
 from transformers import GPT2Model, GPT2TokenizerFast
 import torch
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+import tqdm
 
-# Force transformers to use PyTorch
 os.environ["USE_TF"] = "0"
 
 def extract_tokens_column(dataset):
-    """Extract 'tokens' or 'text' as GPT-2 token IDs from dataset"""
+    """Extract tokens or text as GPT-2 token IDs"""
+    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
     if "tokens" in dataset.column_names:
         all_tokens = []
         for x in dataset["tokens"]:
@@ -24,24 +24,24 @@ def extract_tokens_column(dataset):
                 all_tokens.append(list(map(int, x)))
         return all_tokens
     elif "text" in dataset.column_names:
-        tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
         return [tokenizer.encode(str(x), add_special_tokens=False) for x in dataset["text"]]
     else:
         raise ValueError(f"No 'tokens' or 'text' column found. Columns: {dataset.column_names}")
 
-def compute_gpt2_embeddings(token_lists, model, device="cpu", batch_size=16):
-    """Compute mean GPT-2 embeddings for a list of token ID sequences"""
+def compute_gpt2_embeddings(token_lists, model, tokenizer, device="cpu", batch_size=16):
+    """Compute mean GPT-2 embeddings for token ID sequences"""
     embeddings = []
-    for i in range(0, len(token_lists), batch_size):
+    for i in tqdm.tqdm(range(0, len(token_lists), batch_size), desc="Computing embeddings"):
         batch_tokens = token_lists[i:i+batch_size]
-        max_len = max(len(t) for t in batch_tokens)
-        input_ids = [t + [0]*(max_len - len(t)) for t in batch_tokens]  # pad
-        attention_mask = [[1]*len(t) + [0]*(max_len - len(t)) for t in batch_tokens]
-        input_ids = torch.tensor(input_ids).to(device)
-        attention_mask = torch.tensor(attention_mask).to(device)
+        batch_enc = tokenizer.pad(
+            {"input_ids": batch_tokens},
+            padding=True,
+            return_tensors="pt"
+        )
+        input_ids = batch_enc["input_ids"].to(device)
+        attention_mask = batch_enc["attention_mask"].to(device)
         with torch.no_grad():
             outputs = model(input_ids=input_ids, attention_mask=attention_mask)
-            # Take mean of last hidden state as embedding
             batch_embeds = outputs.last_hidden_state.mean(dim=1).cpu().numpy()
             embeddings.append(batch_embeds)
     return np.vstack(embeddings)
@@ -54,28 +54,19 @@ def filter_cluster_file(input_path, output_folder, threshold=0.5):
     dataset = load_dataset("json", data_files={"train": input_path}, split="train")
     token_lists = extract_tokens_column(dataset)
 
-    # Load GPT-2
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
     model = GPT2Model.from_pretrained("gpt2").to(device)
     model.eval()
 
-    print(f"🤖 Computing GPT-2 embeddings for {len(token_lists)} samples...")
-    embeddings = compute_gpt2_embeddings(token_lists, model, device=device)
+    embeddings = compute_gpt2_embeddings(token_lists, model, tokenizer, device=device)
 
-    # Standardize embeddings
+    # Use mean + threshold to filter without labels
     scaler = StandardScaler()
     embeddings_scaled = scaler.fit_transform(embeddings)
+    mean_scores = embeddings_scaled.mean(axis=1)
+    keep_indices = [i for i, s in enumerate(mean_scores) if s >= threshold]
 
-    # Train a tiny logistic regression classifier on embeddings
-    # For demo, we label the first half positive, second half negative
-    # Replace this with your labeled data if available
-    y_dummy = np.array([1]*len(embeddings)//2 + [0]*(len(embeddings)-len(embeddings)//2))
-    clf = LogisticRegression(max_iter=200)
-    clf.fit(embeddings_scaled, y_dummy)
-
-    print(f"⚡ Running classification on embeddings...")
-    scores = clf.predict_proba(embeddings_scaled)[:, 1]  # probability of positive class
-    keep_indices = [i for i, s in enumerate(scores) if s >= threshold]
     filtered = dataset.select(keep_indices)
 
     os.makedirs(output_folder, exist_ok=True)
@@ -90,7 +81,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_folder", type=str, required=True)
     parser.add_argument("--output_folder", type=str, required=True)
-    parser.add_argument("--threshold", type=float, default=0.5)
+    parser.add_argument("--threshold", type=float, default=0.0)
     args = parser.parse_args()
 
     all_records = []
