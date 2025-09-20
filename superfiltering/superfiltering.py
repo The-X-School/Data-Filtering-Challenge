@@ -7,6 +7,23 @@ from transformers import pipeline
 # Force transformers to use PyTorch
 os.environ["USE_TF"] = "0"
 
+# Safely extract text from dataset column
+def extract_text_column(dataset):
+    for col in ["text", "content"]:
+        if col in dataset.column_names:
+            texts = []
+            for x in dataset[col]:
+                if x is None:
+                    texts.append("")  # empty string for missing values
+                elif isinstance(x, str):
+                    texts.append(x)
+                else:
+                    texts.append(str(x))
+            return texts
+    raise ValueError(
+        f"No 'text' or 'content' column found. Available columns: {dataset.column_names}"
+    )
+
 def filter_cluster_file(input_path, output_folder, model_name, threshold=0.5):
     filename = os.path.basename(input_path)
     output_file = os.path.join(output_folder, f"filtered_{filename}")
@@ -20,15 +37,7 @@ def filter_cluster_file(input_path, output_folder, model_name, threshold=0.5):
     )
 
     # Ensure we always extract string text safely
-    if "text" in dataset.column_names:
-        texts = [str(x) if not isinstance(x, str) else x for x in dataset["text"]]
-    elif "content" in dataset.column_names:
-        texts = [str(x) if not isinstance(x, str) else x for x in dataset["content"]]
-    else:
-        raise ValueError(
-            f"❌ No 'text' or 'content' column found in {input_path}. "
-            f"Available columns: {dataset.column_names}"
-        )
+    texts = extract_text_column(dataset)
 
     # Debug: check first few samples
     print("Sample texts for classification:", texts[:5])
