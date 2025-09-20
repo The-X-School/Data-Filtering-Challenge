@@ -2,7 +2,7 @@ import os
 import json
 import argparse
 from datasets import load_dataset
-from transformers import pipeline, set_seed
+from transformers import pipeline
 
 # Force transformers to use PyTorch
 os.environ["USE_TF"] = "0"
@@ -19,7 +19,16 @@ def filter_cluster_file(input_path, output_folder, model_name, threshold=0.5):
         split="train"
     )
 
-    texts = dataset["text"] if "text" in dataset.column_names else dataset["content"]
+    # Ensure we always extract string text safely
+    if "text" in dataset.column_names:
+        texts = [str(x) for x in dataset["text"]]
+    elif "content" in dataset.column_names:
+        texts = [str(x) for x in dataset["content"]]
+    else:
+        raise ValueError(
+            f"❌ No 'text' or 'content' column found in {input_path}. "
+            f"Available columns: {dataset.column_names}"
+        )
 
     print(f"🤖 Loading model: {model_name}")
     classifier = pipeline("text-classification", model=model_name, device=-1)
@@ -27,7 +36,10 @@ def filter_cluster_file(input_path, output_folder, model_name, threshold=0.5):
     print(f"⚡ Running classification on {len(texts)} samples...")
     preds = classifier(texts, truncation=True, batch_size=16)
 
-    keep_indices = [i for i, p in enumerate(preds) if (p["label"] == "POSITIVE" and p["score"] >= threshold)]
+    keep_indices = [
+        i for i, p in enumerate(preds)
+        if (p["label"] == "POSITIVE" and p["score"] >= threshold)
+    ]
     filtered = dataset.select(keep_indices)
 
     # Save filtered cluster
@@ -56,7 +68,7 @@ def main():
             all_records.extend(filtered)
 
     # Save everything to a single JSONL file
-    final_output_file = os.path.join(args.output_folder, "filtered_dataset.json")
+    final_output_file = os.path.join(args.output_folder, "filtered_dataset.jsonl")
     with open(final_output_file, "w") as f:
         for record in all_records:
             f.write(json.dumps(record) + "\n")
