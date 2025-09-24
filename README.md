@@ -41,7 +41,7 @@ Instructions:
     --input_path=detokenized/climblab2/climblab.jsonl \
     --model_path=model_function_calling_10k_wesley.bin \
     --output_dir=preselect_detokenized_final\
-    --threshold=0.79
+    --threshold=0.80
     ```
 
     The resulting data should be stored in `wesley/preselect_detokenized`, in a few jsonl files. It should already be in the right format to use to train the model. Our version of the train.sh script is located in the Data-Filtering-Challenge repository if needed to run training/evaluation with the data. 
