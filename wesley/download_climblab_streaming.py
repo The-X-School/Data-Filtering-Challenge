@@ -10,9 +10,9 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # --- Configuration ---
 DATASET_NAME = "nvidia/ClimbLab"
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, "tokenized", "climblab")
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, "tokenized", "climblab2")
 OUTPUT_FILENAME = "climblab.jsonl"
-NUM_ROWS_TO_DOWNLOAD = 1_000_000
+NUM_ROWS_TO_DOWNLOAD = 10_000_000
 
 def main():
     parser = argparse.ArgumentParser(description="Download data from Hugging Face and calculate token count.")

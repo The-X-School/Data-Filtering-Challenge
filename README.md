@@ -30,7 +30,7 @@ Instructions:
     python download_climblab_streaming.py
     ```
 
-3. Run the script to detokenize. The detokenized dataset should be saved to `detokenized/climblab/climblab.jsonl`.
+3. Run the script to detokenize. The detokenized dataset should be saved to `detokenized/climblab2/climblab.jsonl`.
     ```
     python detokenize_climblab.py
     ```

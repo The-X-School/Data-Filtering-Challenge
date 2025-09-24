@@ -67,8 +67,8 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Default paths relative to the script's location
-    default_input = os.path.join(script_dir, "tokenized", "climblab", "climblab.jsonl")
-    default_output = os.path.join(script_dir, "detokenized", "climblab", "climblab.jsonl")
+    default_input = os.path.join(script_dir, "tokenized", "climblab2", "climblab.jsonl")
+    default_output = os.path.join(script_dir, "detokenized", "climblab2", "climblab.jsonl")
 
     parser.add_argument('--input_path', type=str, default=default_input,
                         help=f"Path to the input JSONL file. Defaults to '{default_input}'")
