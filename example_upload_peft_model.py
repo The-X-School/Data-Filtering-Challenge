@@ -17,6 +17,8 @@ def parse_args():
                         help="Base model name or path")
     parser.add_argument("--adapter_path", type=str,
                         help="Path to DoRA adapter model")
+    parser.add_argument("--merged_model_path", type=str,
+                        help="Path to an already merged model to upload directly")
     parser.add_argument("--hf_token", type=str, required=True,
                         help="Hugging Face API token")
     parser.add_argument("--repo_id", type=str, required=True,
@@ -38,59 +40,73 @@ def main():
     # Log in to Hugging Face
     login(token=args.hf_token)
     api = HfApi()
-    # Set adapter repo ID if not provided
-    if not hasattr(args, 'adapter_repo_id') or args.adapter_repo_id is None:
-        args.adapter_repo_id = f"{args.repo_id}-adapter"
-    print(f"Loading base model: {args.base_model}")
-    # Load base model and tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(args.base_model)
-    base_model = AutoModelForCausalLM.from_pretrained(args.base_model)
-    # Try to get the model_type from base model config if not provided
-    if not args.model_type:
-        if hasattr(base_model.config, 'model_type'):
-            args.model_type = base_model.config.model_type
-            print(f"Extracted model_type '{args.model_type}' from base model")
-        else:
-            # Try to infer from model name
-            base_model_name = args.base_model.split("/")[-1].lower()
-            if "llama" in base_model_name:
-                args.model_type = "llama"
-            elif "t5" in base_model_name:
-                args.model_type = "t5"
-            elif "bert" in base_model_name:
-                args.model_type = "bert"
+
+    if args.merged_model_path:
+        print(f"Loading merged model from: {args.merged_model_path}")
+        model = AutoModelForCausalLM.from_pretrained(args.merged_model_path)
+        tokenizer = AutoTokenizer.from_pretrained(args.merged_model_path)
+        if not args.base_model:
+            args.base_model = "unknown"
+            print("Warning: --base_model not provided for model card. Using 'unknown'.")
+        # Can't upload adapter if we only have merged
+        args.upload_adapter = False
+        args.merge_weights = True # This will make the logic think it's a merged model
+    else:
+        if not args.base_model or not args.adapter_path:
+            raise ValueError("Either --merged_model_path or both --base_model and --adapter_path must be provided.")
+        # Set adapter repo ID if not provided
+        if not hasattr(args, 'adapter_repo_id') or args.adapter_repo_id is None:
+            args.adapter_repo_id = f"{args.repo_id}-adapter"
+        print(f"Loading base model: {args.base_model}")
+        # Load base model and tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(args.base_model)
+        base_model = AutoModelForCausalLM.from_pretrained(args.base_model)
+        # Try to get the model_type from base model config if not provided
+        if not args.model_type:
+            if hasattr(base_model.config, 'model_type'):
+                args.model_type = base_model.config.model_type
+                print(f"Extracted model_type '{args.model_type}' from base model")
             else:
-                args.model_type = "auto"
-            print(f"Inferred model_type '{args.model_type}' from model name")
-    print(f"Loading adapter from: {args.adapter_path}")
-    # Load DoRA weights
-    model = PeftModel.from_pretrained(base_model, args.adapter_path)
-    # Quick test to ensure model works
-    input_text = "What is the capital of France?"
-    inputs = tokenizer(input_text, return_tensors="pt")
-    print("Testing model with a simple prompt...")
-    with torch.no_grad():
-        outputs = model.generate(inputs.input_ids, max_length=50)
-    output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    print(f"Input: {input_text}")
-    print(f"Output: {output_text}")
-    # Upload adapter separately if requested
-    if args.upload_adapter:
-        # First create the repository for the adapter
-        print(f"Creating repository for adapter: {args.adapter_repo_id}")
-        try:
-            create_repo(
-                repo_id=args.adapter_repo_id,
-                token=args.hf_token,
-                repo_type="model",
-                exist_ok=True
-            )
-        except Exception as e:
-            print(f"Error creating adapter repository: {e}")
-            print("Continuing with model upload...")
-        else:
-            # Create a detailed adapter model card
-            adapter_model_card = f"""---
+                # Try to infer from model name
+                base_model_name = args.base_model.split("/")[-1].lower()
+                if "llama" in base_model_name:
+                    args.model_type = "llama"
+                elif "t5" in base_model_name:
+                    args.model_type = "t5"
+                elif "bert" in base_model_name:
+                    args.model_type = "bert"
+                else:
+                    args.model_type = "auto"
+                print(f"Inferred model_type '{args.model_type}' from model name")
+        print(f"Loading adapter from: {args.adapter_path}")
+        # Load DoRA weights
+        model = PeftModel.from_pretrained(base_model, args.adapter_path)
+        # Quick test to ensure model works
+        input_text = "What is the capital of France?"
+        inputs = tokenizer(input_text, return_tensors="pt")
+        print("Testing model with a simple prompt...")
+        with torch.no_grad():
+            outputs = model.generate(inputs.input_ids, max_length=50)
+        output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        print(f"Input: {input_text}")
+        print(f"Output: {output_text}")
+        # Upload adapter separately if requested
+        if args.upload_adapter:
+            # First create the repository for the adapter
+            print(f"Creating repository for adapter: {args.adapter_repo_id}")
+            try:
+                create_repo(
+                    repo_id=args.adapter_repo_id,
+                    token=args.hf_token,
+                    repo_type="model",
+                    exist_ok=True
+                )
+            except Exception as e:
+                print(f"Error creating adapter repository: {e}")
+                print("Continuing with model upload...")
+            else:
+                # Create a detailed adapter model card
+                adapter_model_card = f"""---
 language:
 - en
 tags:
@@ -122,27 +138,28 @@ inputs = tokenizer(input_text, return_tensors="pt")
 outputs = model.generate(inputs.input_ids, max_length=50)
 print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 ```"""
-            # Create README.md in adapter directory
-            readme_path = os.path.join(args.adapter_path, "README.md")
-            with open(readme_path, "w") as f:
-                f.write(adapter_model_card)
-            # Upload adapter to Hub
-            try:
-                api.upload_folder(
-                    folder_path=args.adapter_path,
-                    repo_id=args.adapter_repo_id,
-                    repo_type="model",
-                    commit_message="Upload DoRA adapter",
-                )
-                print(f"Adapter uploaded successfully to {args.adapter_repo_id}")
-            except Exception as e:
-                print(f"Error uploading adapter: {e}")
-                print("Continuing with model upload...")
-    # Now handle the main model
-    if args.merge_weights:
-        print("Merging DoRA weights with base model...")
-        model = model.merge_and_unload()
-        print("Weights merged successfully")
+                # Create README.md in adapter directory
+                readme_path = os.path.join(args.adapter_path, "README.md")
+                with open(readme_path, "w") as f:
+                    f.write(adapter_model_card)
+                # Upload adapter to Hub
+                try:
+                    api.upload_folder(
+                        folder_path=args.adapter_path,
+                        repo_id=args.adapter_repo_id,
+                        repo_type="model",
+                        commit_message="Upload DoRA adapter",
+                    )
+                    print(f"Adapter uploaded successfully to {args.adapter_repo_id}")
+                except Exception as e:
+                    print(f"Error uploading adapter: {e}")
+                    print("Continuing with model upload...")
+        # Now handle the main model
+        if args.merge_weights:
+            print("Merging DoRA weights with base model...")
+            model = model.merge_and_unload()
+            print("Weights merged successfully")
+
     # Create repository for the main model
     print(f"Creating repository for model: {args.repo_id}")
     try:
@@ -244,38 +261,6 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
         import shutil
         shutil.rmtree(temp_dir)
 
-    # Prepare data for training
-    dataset = load_dataset("json", data_files="data/climblab_sample/climblab_sample.jsonl", split="train")
-
-    def tokenize_function(example):
-        return tokenizer(example["text"], truncation=True, padding="max_length", max_length=128)
-
-    tokenized_dataset = dataset.map(tokenize_function, batched=True)
-
-    # Fine-tune the model
-    training_args = TrainingArguments(
-        output_dir="./results",
-        per_device_train_batch_size=4,
-        num_train_epochs=1,
-        save_steps=10_000,
-        save_total_limit=2,
-        logging_steps=500,
-        fp16=True,  # if your hardware supports it
-    )
-
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=tokenized_dataset,
-    )
-
-    trainer.train()
-
-    trainer.save_model("my-llama-400m-climblab")
-    # Or push to hub
-    # trainer.push_to_hub("your-username/llama-400m-climblab-climblab")
-
-    print(torch.__version__)
 
 if __name__ == "__main__":
     main()
